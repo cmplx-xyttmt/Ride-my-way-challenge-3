@@ -1,11 +1,14 @@
 from app import app
 from app.models import User
-from flask import request, abort, jsonify
+from flask import request, abort, jsonify, g
+from flask_httpauth import HTTPBasicAuth
 
+auth = HTTPBasicAuth()
 rides = []
 
 
 @app.route('/ridemyway/api/v1/rides', methods=['GET'])
+@auth.login_required
 def get_ride():
     rides_as_dicts = [convert_ride_offer(ride) for ride in rides]
     return jsonify({'rides': rides_as_dicts})
@@ -40,3 +43,18 @@ def signup():
     user_id = user.add_new_user()
     print(user_id)
     return jsonify({'username': user.username}), 201
+
+
+@app.route('/ridemyway/api/v1/login', methods=['POST'])
+def login(username, password):
+    pass
+
+
+@auth.verify_password
+def verify_password(username, password):
+    user = User.get_user(username)
+    if not user or not user.verify_password(password):
+        return False
+
+    g.user = user
+    return True
