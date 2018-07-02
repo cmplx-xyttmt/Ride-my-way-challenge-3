@@ -5,11 +5,12 @@ from app.database_setup import config
 
 class User:
 
-    def __init__(self, username=None, password=None):
+    def __init__(self, username=None, password=None, rides_taken=0, rides_given=0):
+        # TODO: Add another field for email address if you have time for implementing notifications
         self.username = username
         self.password_hash = password
-        self.rides_taken = 0
-        self.rides_given = 0
+        self.rides_taken = rides_taken
+        self.rides_given = rides_given
         self.conn = None
         self.cur = None
 
@@ -43,3 +44,29 @@ class User:
                 self.conn.close()
 
         return user_id
+
+    @staticmethod
+    def get_user(username):
+        """Gets a user from the database whose username matches the one given"""
+        sql = "SELECT * FROM users WHERE username = (%s)"
+        params = config()
+        conn = psycopg2.connect(**params)
+        cur = conn.cursor()
+        user = None
+        try:
+            cur.execute(sql, (username,))
+            row = cur.fetchone()
+            username = row[1]
+            password = row[2]
+            rides_taken = row[3]
+            rides_given = row[4]
+            user = User(username, password, rides_taken, rides_given)
+            conn.commit()
+            cur.close()
+        except (Exception, psycopg2.DatabaseError) as error:
+            print("Error: ", error)
+        finally:
+            if conn is not None:
+                conn.close()
+
+        return user
