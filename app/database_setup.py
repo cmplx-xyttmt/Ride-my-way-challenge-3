@@ -2,7 +2,7 @@ import psycopg2
 from configparser import ConfigParser
 
 
-def config(filename='database.ini', section='postgresql'):
+def config(filename='app/database.ini', section='postgresql'):
     """This sets up the parameters for connecting
      to the database as defined in the database.ini file"""
     parser = ConfigParser()
