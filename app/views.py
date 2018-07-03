@@ -1,6 +1,6 @@
 from app import app
 from app.models import User
-from flask import request, abort, jsonify, g
+from flask import request, abort, jsonify, g, make_response
 from flask_httpauth import HTTPBasicAuth
 
 auth = HTTPBasicAuth()
@@ -53,8 +53,38 @@ def get_auth_token():
 
 
 @app.route('/ridemyway/api/v1/auth/login', methods=['POST'])
-def login(username, password):
-    pass
+def login():
+    """Login an existing user"""
+    data = request.get_json()
+    username = data.get('username', None)
+    password = data.get('password', None)
+    if not username or not password:
+        response = {
+            'message': 'Make sure you enter a username and a password'
+        }
+        return make_response(jsonify(response)), 401
+
+    user = User.get_user(username)
+    if not user:
+        response = {
+            'message': 'User account does not exist'
+        }
+        return make_response(jsonify(response)), 401
+
+    if user.verify_password(password):
+        # generate access token
+        token = user.generate_auth_token()
+        response = {
+            'message': 'Logged in successfully',
+            'access_token': token.decode()
+        }
+        return make_response(jsonify(response)), 200
+
+    # If wrong password
+    response = {
+        'message': 'Invalid user credentials'
+    }
+    return make_response(jsonify(response)), 401
 
 
 @auth.verify_password
