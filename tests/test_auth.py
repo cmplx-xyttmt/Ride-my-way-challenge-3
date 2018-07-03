@@ -23,6 +23,20 @@ class TestAuth(unittest.TestCase):
         data = json.loads(str(response.data.decode()))
         self.assertEqual(data['username'], self.user.username)
 
+    def test_login(self):
+        """Tests if a user can login"""
+        req_data = {'username': self.user.username,
+                    'password': "python"}
+        response = self.client.post("ridemyway/api/v1/auth/login",
+                                    content_type="application/json",
+                                    data=json.dumps(req_data))
+
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(str(response.data.decode()))
+        self.assertIn('message', data)
+        self.assertIn('access_token', data)
+        self.assertEqual(data['message'], "Logged in successfully")
+
 
 if __name__ == '__main__':
     unittest.main()
