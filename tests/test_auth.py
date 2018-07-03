@@ -29,6 +29,12 @@ class TestAuth(unittest.TestCase):
         """Tests if a user can login"""
         req_data = {'username': self.user.username,
                     'password': "python"}
+
+        # First sign up the user
+        self.client.post("ridemyway/api/v1/auth/signup",
+                         content_type="application/json",
+                         data=json.dumps(req_data))
+
         response = self.client.post("ridemyway/api/v1/auth/login",
                                     content_type="application/json",
                                     data=json.dumps(req_data))
