@@ -87,6 +87,6 @@ class User:
             'user': self.username,
             'exp': datetime.datetime.utcnow() + datetime.timedelta(days=1),
         }
-        token = jwt.encode(payload, 'string', algorithm='HS256')
+        token = jwt.encode(payload, app.config['SECRET'], algorithm='HS256')
 
         return token
