@@ -1,10 +1,10 @@
 import psycopg2
-from flask import jsonify
 from passlib.apps import custom_app_context as pwd_context
-from app.database_setup import config
-from app import app
+from configure_database import config
+from app.database_setup import create_tables
 import jwt
 import datetime
+from app import app
 
 
 class User:
@@ -27,6 +27,10 @@ class User:
     def initiate_connection(self):
         """Initiates a connection to the database and sets the cursor"""
         params = config()
+        if app.config['TESTING']:
+            params['database'] = 'ridemywaydb_testing'
+
+        create_tables()
         self.conn = psycopg2.connect(**params)
         self.cur = self.conn.cursor()
 
@@ -54,6 +58,9 @@ class User:
         """Gets a user from the database whose username matches the one given"""
         sql = "SELECT * FROM users WHERE username = (%s)"
         params = config()
+        if app.config['TESTING']:
+            params['database'] = 'ridemywaydb_testing'
+        create_tables()
         conn = psycopg2.connect(**params)
         cur = conn.cursor()
         user = None
