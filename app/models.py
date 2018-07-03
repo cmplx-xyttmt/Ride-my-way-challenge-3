@@ -1,9 +1,10 @@
 import psycopg2
+from flask import jsonify
 from passlib.apps import custom_app_context as pwd_context
 from app.database_setup import config
-from itsdangerous import (TimedJSONWebSignatureSerializer
-                          as Serializer, BadSignature, SignatureExpired)
 from app import app
+import jwt
+import datetime
 
 
 class User:
@@ -74,19 +75,11 @@ class User:
 
         return user
 
-    def generate_auth_token(self, expiration=600):
-        s = Serializer(app.config['SECRET_KEY'], expires_in=expiration)
-        return s.dumps({'username': self.username})
+    def generate_auth_token(self):
+        payload = {
+            'user': self.username,
+            'exp': datetime.datetime.utcnow() + datetime.timedelta(days=1),
+        }
+        token = jwt.encode(payload, 'string', algorithm='HS256')
 
-    @staticmethod
-    def verify_auth_token(token):
-        s = Serializer(app.config['SECRET_KEY'])
-        try:
-            data = s.loads(token)
-        except SignatureExpired:
-            return None  # valid token, but expired
-        except BadSignature:
-            return None  # invalid token
-
-        user = User.get_user(data['username'])
-        return user
+        return token

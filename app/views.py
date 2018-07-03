@@ -68,6 +68,7 @@ def login():
         return make_response(jsonify(response)), 401
 
     user = User.get_user(username)
+
     if not user:
         response = {
             'message': 'User account does not exist'
@@ -79,7 +80,7 @@ def login():
         token = user.generate_auth_token()
         response = {
             'message': 'Logged in successfully',
-            'access_token': token.decode()
+            'access_token': token.decode('UTF-8')
         }
         return make_response(jsonify(response)), 200
 
@@ -90,15 +91,11 @@ def login():
     return make_response(jsonify(response)), 401
 
 
-@auth.verify_password
-def verify_password(username_or_token, password):
-    # first try to authenticate by token
-    user = User.verify_auth_token(username_or_token)
-    if not user:
-        # try to authenticate with username/password
-        user = User.get_user(username=username_or_token)
-        if not user or not user.verify_password(password):
-            return False
+def verify_password(username, password):
+    # try to authenticate with username/password
+    user = User.get_user(username=username)
+    if not user or not user.verify_password(password):
+        return False
 
     g.user = user
     return True
