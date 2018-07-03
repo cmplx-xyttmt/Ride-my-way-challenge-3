@@ -1,23 +1,6 @@
 import psycopg2
-from configparser import ConfigParser
-
-
-def config(filename='app/database.ini', section='postgresql'):
-    """This sets up the parameters for connecting
-     to the database as defined in the database.ini file"""
-    parser = ConfigParser()
-    parser.read(filename)
-
-    db = {}
-    if parser.has_section(section):
-        params = parser.items(section)
-        for param in params:
-            db[param[0]] = param[1]
-    else:
-        raise Exception('Section {0} not found in the {1} file'.
-                        format(section, filename))
-
-    return db
+from configure_database import config
+from app import app
 
 
 def create_tables():
@@ -62,6 +45,8 @@ def create_tables():
     try:
         # Read the connection paramaters
         params = config()
+        if app.config['TESTING']:
+            params['database'] = 'ridemywaydb_testing'
         conn = psycopg2.connect(**params)
         cur = conn.cursor()
 
@@ -77,7 +62,3 @@ def create_tables():
     finally:
         if conn is not None:
             conn.close()
-
-
-if __name__ == '__main__':
-    create_tables()
