@@ -45,7 +45,14 @@ def signup():
     return jsonify({'username': user.username}), 201
 
 
-@app.route('/ridemyway/api/v1/login', methods=['POST'])
+@app.route('ridemyway/api/v1/auth/token')
+@auth.login_required
+def get_auth_token():
+    token = g.user.generate_auth_token()
+    return jsonify({'token': token.decode('ascii')})
+
+
+@app.route('/ridemyway/api/v1/auth/login', methods=['POST'])
 def login(username, password):
     pass
 
