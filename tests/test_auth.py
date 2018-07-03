@@ -1,4 +1,6 @@
 import unittest
+import psycopg2
+from configure_database import config
 import json
 from app.models import User
 from app import app
@@ -36,6 +38,27 @@ class TestAuth(unittest.TestCase):
         self.assertIn('message', data)
         self.assertIn('access_token', data)
         self.assertEqual(data['message'], "Logged in successfully")
+
+    def tearDown(self):
+        """Deletes the tables in the database after using it for testing"""
+        sql = "DROP SCHEMA public CASCADE"
+        sql2 = "CREATE SCHEMA public"
+        params = config()
+        if app.config['TESTING']:
+            params['database'] = 'ridemywaydb_testing'
+
+        conn = psycopg2.connect(**params)
+        cur = conn.cursor()
+        try:
+            cur.execute(sql)
+            cur.execute(sql2)
+            conn.commit()
+            cur.close()
+        except (Exception, psycopg2.DatabaseError) as error:
+            print("Error: ", error)
+        finally:
+            if conn is not None:
+                conn.close()
 
 
 if __name__ == '__main__':
