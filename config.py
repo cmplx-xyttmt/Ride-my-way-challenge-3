@@ -1,12 +1,8 @@
-from app.database_setup import config
-
-
 class Config:
     """Parent configuration class"""
     DEBUG = False
     CSRF_ENABLED = True
     SECRET = "this_is_the_secret_key"
-    DATABASE_PARAMS = config()
 
 
 class DevelopmentConfig(Config):
@@ -17,7 +13,6 @@ class DevelopmentConfig(Config):
 class TestingConfig(Config):
     """Configurations for Testing, with a separate database."""
     TESTING = True
-    DATABASE_PARAMS = config(section='testing')
 
 
 class ProductionConfig(Config):
