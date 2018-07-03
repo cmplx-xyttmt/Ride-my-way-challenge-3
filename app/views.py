@@ -45,7 +45,7 @@ def signup():
     return jsonify({'username': user.username}), 201
 
 
-@app.route('ridemyway/api/v1/auth/token')
+@app.route('/ridemyway/api/v1/auth/token')
 @auth.login_required
 def get_auth_token():
     token = g.user.generate_auth_token()
@@ -55,6 +55,9 @@ def get_auth_token():
 @app.route('/ridemyway/api/v1/auth/login', methods=['POST'])
 def login():
     """Login an existing user"""
+    if not request.is_json:
+        abort(400, 'Make sure your request contains json data')
+
     data = request.get_json()
     username = data.get('username', None)
     password = data.get('password', None)
@@ -99,3 +102,15 @@ def verify_password(username_or_token, password):
 
     g.user = user
     return True
+
+
+@app.errorhandler(404)
+def not_found(error):
+    return make_response(jsonify({"error": 'Ride Not Found',
+                                  "message": error.description}), 404)
+
+
+@app.errorhandler(400)
+def bad_request(error):
+    return make_response(jsonify({"error": 'Bad request.',
+                                  'message': error.description}), 400)
