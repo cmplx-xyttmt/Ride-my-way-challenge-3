@@ -31,9 +31,13 @@ def create_tables():
         CREATE TABLE IF NOT EXISTS riderequests (
           request_id SERIAL PRIMARY KEY,
           ride_id INTEGER NOT NULL,
+          passenger_id INTEGER NOT NULL,
           FOREIGN KEY (ride_id)
           REFERENCES rides(ride_id)
           ON UPDATE CASCADE ON DELETE CASCADE,
+          FOREIGN KEY (passenger_id)
+          REFERENCES users(user_id)
+          ON UPDATE CASCADE ON DELETE CASCADE, 
           accepted BOOLEAN,
           rejected BOOLEAN
         )
