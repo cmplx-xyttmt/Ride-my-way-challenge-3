@@ -95,6 +95,17 @@ class User:
 
         return token
 
+    @staticmethod
+    def decode_token(token):
+        """Used to decode a token obtained from the authorization header"""
+        try:
+            payload = jwt.decode(token, app.config['SECRET'])
+            return payload['user']
+        except jwt.ExpiredSignature:
+            return "Token is expired. Please login again"
+        except jwt.InvalidTokenError:
+            return "Invalid token. Please register or login"
+
 
 class Ride:
 
