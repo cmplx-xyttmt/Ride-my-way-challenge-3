@@ -1,16 +1,9 @@
 from app import app
-from app.models import User
+from app.models import User, Ride
 from flask import request, abort, jsonify, g, make_response
 from flask_httpauth import HTTPBasicAuth
 
 auth = HTTPBasicAuth()
-rides = []
-
-
-@app.route('/ridemyway/api/v1/rides', methods=['GET'])
-def get_rides():
-    rides_as_dicts = [convert_ride_offer(ride) for ride in rides]
-    return jsonify({'rides': rides_as_dicts})
 
 
 def convert_ride_offer(ride_offer):
@@ -103,6 +96,53 @@ def login():
     return make_response(jsonify(response)), 401
 
 
+@app.route('/ridemyway/api/v1/rides', methods=['GET'])
+def get_rides():
+    pass
+
+
+@app.route('/ridemyway/api/v1/users/rides', methods=['POST'])
+def create_ride():
+    """Endpoint for creating a new ride offer"""
+    access_token = request.headers.get('Authorization')
+    if access_token:
+        username = User.decode_token(access_token)  # TODO: Change this to user_id
+
+        if username == "Invalid token. Please register or login":
+            abort(401, username)
+        elif username == "Token is expired. Please login again":
+            abort(401, username)
+
+        if not request.is_json:
+            abort(400, 'Make sure your request contains json data')
+
+        data = request.get_json()
+        if 'name' not in data or \
+                'origin' not in data or \
+                'destination' not in data:
+            abort(400,
+                  'Make sure you have specified name, '
+                  'origin and destination attributes in your json request.')
+
+        ride_offer = Ride(data['name'],
+                          data['origin'],
+                          data['destination'],
+                          data.get('price', 0))
+
+        print(username)
+        user = User.get_user(username)
+        ride_id = ride_offer.add_new_ride_offer(user.user_id)
+        response = {
+            'message': 'Ride created successfully',
+            'ride_id': ride_id,
+            'ride': convert_ride_offer(ride_offer)
+        }
+
+        return make_response(jsonify(response)), 201
+    else:
+        abort(401, 'Please provide an access token')
+
+
 def verify_password(username, password):
     # try to authenticate with username/password
     user = User.get_user(username=username)
@@ -128,4 +168,10 @@ def bad_request(error):
 @app.errorhandler(409)
 def conflict(error):
     return make_response(jsonify({"error": 'Conflict.',
+                                  'message': error.description}))
+
+
+@app.errorhandler(401)
+def unauthorized(error):
+    return make_response(jsonify({"error": 'Unauthorized access.',
                                   'message': error.description}))
