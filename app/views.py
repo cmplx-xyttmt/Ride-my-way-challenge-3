@@ -203,7 +203,7 @@ def create_ride_request(ride_id):
         abort(401, 'Please provide an access token')
 
 
-@app.route('/ridemyway/api/v1/users/rides/<ride_id>/requests')
+@app.route('/ridemyway/api/v1/users/rides/<ride_id>/requests', methods=['GET'])
 def view_ride_requests(ride_id):
     try:
         ride_id = int(ride_id)
@@ -225,8 +225,9 @@ def view_ride_requests(ride_id):
         #  Check if this user is the one that created the ride request
         if ride.name == username:
             requests_list = Request.get_ride_requests(ride_id)
+            requests_list = [req.__dict__ for req in requests_list]
             response = {
-                'ride_requests': requests_list.__dict__
+                'ride_requests': requests_list
             }
             return make_response(jsonify(response)), 200
         else:
