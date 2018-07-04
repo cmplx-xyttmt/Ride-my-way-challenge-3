@@ -110,7 +110,7 @@ class User:
 class Ride:
 
     def __init__(self, name, origin, destination, price=0):
-        self.id = 0 # Default value
+        self.id = 0  # Default value
         self.name = name
         self.origin = origin
         self.destination = destination
@@ -127,7 +127,7 @@ class Ride:
         create_tables()
         conn = psycopg2.connect(**params)
         cur = conn.cursor()
-        ride_id = None
+        ride_id = 0
         try:
             cur.execute(sql, (user_id, self.origin, self.destination, self.price))
             ride_id = cur.fetchone()[0]
