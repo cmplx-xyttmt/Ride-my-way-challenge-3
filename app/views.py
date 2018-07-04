@@ -98,7 +98,7 @@ def get_rides():
 
         ride_offers = Ride.get_all_rides()
         rides_as_dicts = [convert_ride_offer(ride) for ride in ride_offers]
-        return jsonify({'rides': rides_as_dicts})
+        return jsonify({'rides': rides_as_dicts}), 200
     else:
         abort(401, 'Please provide an access token')
 
