@@ -142,6 +142,39 @@ class Ride:
         return ride_id
 
     @staticmethod
+    def get_one_ride(ride_id):
+        """Gets only one ride"""
+        sql = "SELECT r.*, u.username FROM rides r " \
+              "LEFT JOIN users u ON (u.user_id=r.user_id)" \
+              "WHERE r.ride_id = (%s)"
+
+        params = config()
+        if app.config['TESTING']:
+            params['database'] = 'ridemywaydb_testing'
+        create_tables()
+        conn = psycopg2.connect(**params)
+        cur = conn.cursor()
+        ride = None
+        try:
+            cur.execute(sql, (ride_id,))
+            row = cur.fetchone()
+            if row:
+                origin = row[2]
+                destination = row[3]
+                price = row[4]
+                username = row[5]
+                new_ride = Ride(username, origin, destination, price)
+                new_ride.id = row[0]
+                ride = new_ride
+        except (Exception, psycopg2.DatabaseError) as error:
+            print(error)
+        finally:
+            if conn is not None:
+                conn.close()
+
+        return ride
+
+    @staticmethod
     def get_all_rides():
         """Retrieves all the rides from the database"""
         sql = "SELECT r.*, u.username FROM rides r LEFT JOIN users u ON (u.user_id=r.user_id)"
