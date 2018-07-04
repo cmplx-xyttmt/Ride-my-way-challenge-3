@@ -88,15 +88,32 @@ def login():
 
 @app.route('/ridemyway/api/v1/rides', methods=['GET'])
 def get_rides():
-    pass
+    """API endpoint for getting all the ride offers"""
+
+    access_token = request.headers.get('Authorization')
+    if access_token:
+        username = User.decode_token(access_token)
+        if username == "Invalid token. Please register or login":
+            abort(401, username)
+        elif username == "Token is expired. Please login again":
+            abort(401, username)
+
+        ride_offers = Ride.get_all_rides()
+        rides_as_dicts = [convert_ride_offer(ride) for ride in ride_offers]
+        return jsonify({'rides': rides_as_dicts})
+    else:
+        abort(401, 'Please provide an access token')
 
 
 @app.route('/ridemyway/api/v1/users/rides', methods=['POST'])
 def create_ride():
     """Endpoint for creating a new ride offer"""
+    if not request.is_json:
+        abort(400, 'Make sure your request contains json data')
+
     access_token = request.headers.get('Authorization')
     if access_token:
-        username = User.decode_token(access_token)  # TODO: Change this to user_id
+        username = User.decode_token(access_token)
 
         if username == "Invalid token. Please register or login":
             abort(401, username)
