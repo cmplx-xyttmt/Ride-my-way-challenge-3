@@ -218,10 +218,10 @@ class Request:
         self.accepted = False
         self.rejected = False
 
-    def add_ride_request(self, ride_id):
+    def add_ride_request(self, ride_id, passenger_id):
         """Adds a new request into the database"""
-        sql = "INSERT INTO riderequests(ride_id, accepted, rejected)" \
-              "VALUES (%s, %s, %s) RETURNING request_id"
+        sql = "INSERT INTO riderequests(ride_id, passenger_id, accepted, rejected)" \
+              "VALUES (%s, %s, %s, %s) RETURNING request_id"
 
         params = config()
         if app.config['TESTING']:
@@ -231,7 +231,7 @@ class Request:
         cur = conn.cursor()
         req_id = 0
         try:
-            cur.execute(sql, (ride_id, self.accepted, self.rejected))
+            cur.execute(sql, (ride_id, passenger_id, self.accepted, self.rejected))
             req_id = cur.fetchone()[0]
             conn.commit()
             cur.close()
@@ -243,3 +243,41 @@ class Request:
 
         self.id = req_id
         return self.id
+
+    @staticmethod
+    def get_ride_requests(ride_id):
+        sql = "SELECT r.*, u.username FROM riderequests r " \
+              "LEFT JOIN users u on r.passenger_id = u.user_id" \
+              " WHERE r.ride_id = (%s)"
+
+        params = config()
+        if app.config['TESTING']:
+            params['database'] = 'ridemywaydb_testing'
+        create_tables()
+        conn = psycopg2.connect(**params)
+        cur = conn.cursor()
+        ride_requests = []
+        try:
+            cur.execute(sql, (ride_id, ))
+            row = cur.fetchone()
+            while row:
+                rq_id = row[0]
+                rq_acc = row[3]
+                rq_rej = row[4]
+                rq_name = row[5]
+                ride_req = Request(rq_name)
+                ride_req.id = rq_id
+                ride_req.accepted = rq_acc
+                ride_req.rejected = rq_rej
+                ride_requests.append(ride_req)
+                row = cur.fetchone()
+
+            conn.commit()
+            cur.close()
+        except (Exception, psycopg2.DatabaseError) as error:
+            print(error)
+        finally:
+            if conn is not None:
+                conn.close()
+
+        return ride_requests
