@@ -125,6 +125,8 @@ def get_ride(ride_id):
             return jsonify({'ride': convert_ride_offer(ride)}), 200
         else:
             abort(400, 'Ride does not exist.')
+    else:
+        abort(401, 'Please provide an access token')
 
 
 @app.route('/ridemyway/api/v1/users/rides', methods=['POST'])
@@ -169,6 +171,11 @@ def create_ride():
         return make_response(jsonify(response)), 201
     else:
         abort(401, 'Please provide an access token')
+
+
+@app.route('/ridemyway/api/v1/rides/<ride_id>/requests', methods=['POST'])
+def create_ride_request(ride_id):
+
 
 
 def verify_token(access_token):
