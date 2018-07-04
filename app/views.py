@@ -92,11 +92,9 @@ def get_rides():
 
     access_token = request.headers.get('Authorization')
     if access_token:
-        username = User.decode_token(access_token)
-        if username == "Invalid token. Please register or login":
-            abort(401, username)
-        elif username == "Token is expired. Please login again":
-            abort(401, username)
+        token_good = verify_token(access_token)
+        if not token_good[0]:
+            abort(401, token_good[1])
 
         ride_offers = Ride.get_all_rides()
         rides_as_dicts = [convert_ride_offer(ride) for ride in ride_offers]
@@ -113,12 +111,11 @@ def create_ride():
 
     access_token = request.headers.get('Authorization')
     if access_token:
-        username = User.decode_token(access_token)
+        token_good = verify_token(access_token)
+        if not token_good[0]:
+            abort(401, token_good[1])
 
-        if username == "Invalid token. Please register or login":
-            abort(401, username)
-        elif username == "Token is expired. Please login again":
-            abort(401, username)
+        username = token_good[1]
 
         if not request.is_json:
             abort(400, 'Make sure your request contains json data')
@@ -150,14 +147,15 @@ def create_ride():
         abort(401, 'Please provide an access token')
 
 
-def verify_password(username, password):
-    # try to authenticate with username/password
-    user = User.get_user(username=username)
-    if not user or not user.verify_password(password):
-        return False
+def verify_token(access_token):
+    """Determine if the access token is correct"""
+    username = User.decode_token(access_token)
 
-    g.user = user
-    return True
+    if username == "Invalid token. Please register or login":
+        return False, username
+    elif username == "Token is expired. Please login again":
+        return False, username
+    return True, username
 
 
 @app.errorhandler(404)
