@@ -29,15 +29,13 @@ def create_tables():
         """,
         """
         CREATE TABLE IF NOT EXISTS riderequests (
+          request_id SERIAL PRIMARY KEY,
           ride_id INTEGER NOT NULL,
-          user_id INTEGER NOT NULL,
-          PRIMARY KEY (ride_id, user_id),
           FOREIGN KEY (ride_id)
           REFERENCES rides(ride_id)
           ON UPDATE CASCADE ON DELETE CASCADE,
-          FOREIGN KEY (user_id)
-          REFERENCES users(user_id)
-          ON UPDATE CASCADE ON DELETE CASCADE
+          accepted BOOLEAN,
+          rejected BOOLEAN
         )
         """
     )
