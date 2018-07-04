@@ -37,7 +37,15 @@ def signup():
     password = json_request['password']
     if username is None or password is None:
         abort(400, 'Missing arguments')
-    # TODO: Add a check for existing user
+
+    user = User.get_user(username)
+    if user:
+        response = {
+            'error': 'Conflict',
+            'message': 'User already exists. Choose a different username'
+        }
+        return make_response(jsonify(response)), 409
+
     user = User(username=username)
     user.hash_password(password)
     user_id = user.add_new_user()
@@ -111,3 +119,9 @@ def not_found(error):
 def bad_request(error):
     return make_response(jsonify({"error": 'Bad request.',
                                   'message': error.description}), 400)
+
+
+@app.errorhandler(409)
+def conflict(error):
+    return make_response(jsonify({"error": 'Conflict.',
+                                  'message': error.description}))
