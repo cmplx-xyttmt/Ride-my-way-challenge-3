@@ -9,8 +9,8 @@ from app import app
 
 class User:
 
-    def __init__(self, username=None, password=None, rides_taken=0, rides_given=0):
-        # TODO: Add another field for email address if you have time for implementing notifications
+    def __init__(self, username=None, password=None,
+                 rides_taken=0, rides_given=0):
         self.username = username
         self.user_id = 0  # Default value
         self.password_hash = password
@@ -37,12 +37,16 @@ class User:
 
     def add_new_user(self):
         """Adds a new user to the database"""
-        sql = "INSERT  INTO users (username, user_password, rides_taken, rides_given)" \
+        sql = "INSERT  INTO users (username, user_password, " \
+              "rides_taken, rides_given)" \
               "VALUES (%s, %s, %s, %s) RETURNING user_id"
         user_id = None
         self.initiate_connection()
         try:
-            self.cur.execute(sql, (self.username, self.password_hash, self.rides_given, self.rides_taken))
+            self.cur.execute(sql, (self.username,
+                                   self.password_hash,
+                                   self.rides_given,
+                                   self.rides_taken))
             user_id = self.cur.fetchone()[0]
             self.conn.commit()
             self.cur.close()
@@ -56,7 +60,8 @@ class User:
 
     @staticmethod
     def get_user(username):
-        """Gets a user from the database whose username matches the one given"""
+        """Gets a user from the database
+        whose username matches the one given"""
         sql = "SELECT * FROM users WHERE username = (%s)"
         params = config()
         if app.config['TESTING']:
@@ -129,7 +134,10 @@ class Ride:
         cur = conn.cursor()
         ride_id = 0
         try:
-            cur.execute(sql, (user_id, self.origin, self.destination, self.price))
+            cur.execute(sql, (user_id,
+                              self.origin,
+                              self.destination,
+                              self.price))
             ride_id = cur.fetchone()[0]
             conn.commit()
             cur.close()
@@ -178,7 +186,8 @@ class Ride:
     @staticmethod
     def get_all_rides():
         """Retrieves all the rides from the database"""
-        sql = "SELECT r.*, u.username FROM rides r LEFT JOIN users u ON (u.user_id=r.user_id)"
+        sql = "SELECT r.*, u.username FROM rides r " \
+              "LEFT JOIN users u ON (u.user_id=r.user_id)"
 
         params = config()
         if app.config['TESTING']:
@@ -220,7 +229,8 @@ class Request:
 
     def add_ride_request(self, ride_id, passenger_id):
         """Adds a new request into the database"""
-        sql = "INSERT INTO riderequests(ride_id, passenger_id, accepted, rejected)" \
+        sql = "INSERT INTO " \
+              "riderequests(ride_id, passenger_id, accepted, rejected)" \
               "VALUES (%s, %s, %s, %s) RETURNING request_id"
 
         params = config()
@@ -231,7 +241,10 @@ class Request:
         cur = conn.cursor()
         req_id = 0
         try:
-            cur.execute(sql, (ride_id, passenger_id, self.accepted, self.rejected))
+            cur.execute(sql, (ride_id,
+                              passenger_id,
+                              self.accepted,
+                              self.rejected))
             req_id = cur.fetchone()[0]
             conn.commit()
             cur.close()

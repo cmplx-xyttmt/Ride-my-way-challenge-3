@@ -20,7 +20,8 @@ def signup():
     json_request = request.get_json()
     if 'username' not in json_request or 'password' not in json_request:
         abort(400,
-              'Make sure you have a name and password attribute in your json request')
+              'Make sure you have a name '
+              'and password attribute in your json request')
 
     username = json_request['username']
     password = json_request['password']
