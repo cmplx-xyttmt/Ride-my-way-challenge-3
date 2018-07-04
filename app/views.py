@@ -1,6 +1,6 @@
 from app import app
-from app.models import User, Ride
-from flask import request, abort, jsonify, g, make_response
+from app.models import User, Ride, Request
+from flask import request, abort, jsonify, make_response
 
 
 def convert_ride_offer(ride_offer):
@@ -175,7 +175,31 @@ def create_ride():
 
 @app.route('/ridemyway/api/v1/rides/<ride_id>/requests', methods=['POST'])
 def create_ride_request(ride_id):
+    try:
+        ride_id = int(ride_id)
+    except ValueError:
+        ride_id = ride_id
 
+    if type(ride_id) is not int:
+        abort(400, 'Make sure the ride id is an integer')
+
+    access_token = request.headers.get('Authorization')
+    if access_token:
+        token_good = verify_token(access_token)
+        if not token_good[0]:
+            abort(401, token_good[1])
+
+        username = token_good[1]
+        ride_req = Request(username)
+        req_id = ride_req.add_ride_request(ride_id)
+        response = {
+            'message': 'Ride request created successfully',
+            'request_id': req_id,
+            'ride_request': ride_req.__dict__
+        }
+        return make_response(jsonify(response)), 201
+    else:
+        abort(401, 'Please provide an access token')
 
 
 def verify_token(access_token):
