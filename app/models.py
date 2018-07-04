@@ -105,7 +105,7 @@ class Ride:
         self.price = price
         self.requests = []
 
-    def create_new_ride_offer(self, user_id):
+    def add_new_ride_offer(self, user_id):
         """Adds a new ride offer associated with a specific user"""
         sql = "INSERT INTO rides(user_id, origin, destination, price)" \
               "values (%s, %s, %s, %s) RETURNING ride_id"
