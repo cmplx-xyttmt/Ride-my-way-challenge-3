@@ -12,6 +12,7 @@ class User:
     def __init__(self, username=None, password=None, rides_taken=0, rides_given=0):
         # TODO: Add another field for email address if you have time for implementing notifications
         self.username = username
+        self.user_id = 0  # Default value
         self.password_hash = password
         self.rides_taken = rides_taken
         self.rides_given = rides_given
@@ -68,11 +69,13 @@ class User:
             cur.execute(sql, (username,))
             row = cur.fetchone()
             if row:
+                user_id = row[0]
                 username = row[1]
                 password = row[2]
                 rides_taken = row[3]
                 rides_given = row[4]
                 user = User(username, password, rides_taken, rides_given)
+                user.user_id = user_id
             conn.commit()
             cur.close()
         except (Exception, psycopg2.DatabaseError) as error:
