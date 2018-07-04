@@ -67,11 +67,12 @@ class User:
         try:
             cur.execute(sql, (username,))
             row = cur.fetchone()
-            username = row[1]
-            password = row[2]
-            rides_taken = row[3]
-            rides_given = row[4]
-            user = User(username, password, rides_taken, rides_given)
+            if row:
+                username = row[1]
+                password = row[2]
+                rides_taken = row[3]
+                rides_given = row[4]
+                user = User(username, password, rides_taken, rides_given)
             conn.commit()
             cur.close()
         except (Exception, psycopg2.DatabaseError) as error:
