@@ -43,7 +43,7 @@ def create_tables():
 
     conn = None
     try:
-        # Read the connection paramaters
+        # Read the connection parameters
         params = config()
         if app.config['TESTING']:
             params['database'] = 'ridemywaydb_testing'
