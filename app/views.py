@@ -203,6 +203,41 @@ def create_ride_request(ride_id):
         abort(401, 'Please provide an access token')
 
 
+@app.route('/ridemyway/api/v1/users/rides/<ride_id>/requests')
+def view_ride_requests(ride_id):
+    try:
+        ride_id = int(ride_id)
+    except ValueError:
+        ride_id = ride_id
+
+    if type(ride_id) is not int:
+        abort(400, 'Make sure the ride id is an integer')
+
+    access_token = request.headers.get('Authorization')
+    if access_token:
+        token_good = verify_token(access_token)
+        if not token_good[0]:
+            abort(401, token_good[1])
+
+        username = token_good[1]
+        ride = Ride.get_one_ride(ride_id)
+
+        #  Check if this user is the one that created the ride request
+        if ride.name == username:
+            requests_list = Request.get_ride_requests(ride_id)
+            response = {
+                'ride_requests': requests_list.__dict__
+            }
+            return make_response(jsonify(response)), 200
+        else:
+            abort(401,
+                  'You are not authorized to view these '
+                  'ride requests because you did not create this ride offer.')
+
+    else:
+        abort(401, 'Please provide an access token')
+
+
 def verify_token(access_token):
     """Determine if the access token is correct"""
     username = User.decode_token(access_token)
