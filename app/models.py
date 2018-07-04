@@ -110,6 +110,7 @@ class User:
 class Ride:
 
     def __init__(self, name, origin, destination, price=0):
+        self.id = 0 # Default value
         self.name = name
         self.origin = origin
         self.destination = destination
@@ -139,3 +140,37 @@ class Ride:
                 conn.close()
 
         return ride_id
+
+    @staticmethod
+    def get_all_rides():
+        """Retrieves all the rides from the database"""
+        sql = "SELECT r.*, u.username FROM rides r LEFT JOIN users u ON (u.user_id=r.user_id)"
+
+        params = config()
+        if app.config['TESTING']:
+            params['database'] = 'ridemywaydb_testing'
+        create_tables()
+        conn = psycopg2.connect(**params)
+        cur = conn.cursor()
+        rides = []
+        try:
+            cur.execute(sql)
+            row = cur.fetchone()
+            while row:
+                origin = row[2]
+                destination = row[3]
+                price = row[4]
+                username = row[5]
+                new_ride = Ride(username, origin, destination, price)
+                new_ride.id = row[0]
+                rides.append(new_ride)
+                row = cur.fetchone()
+            conn.commit()
+            cur.close()
+        except (Exception, psycopg2.DatabaseError) as error:
+            print(error)
+        finally:
+            if conn is not None:
+                conn.close()
+
+        return rides
