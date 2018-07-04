@@ -103,6 +103,30 @@ def get_rides():
         abort(401, 'Please provide an access token')
 
 
+@app.route('/ridemyway/api/v1/rides/<ride_id>')
+def get_ride(ride_id):
+    """API endpoint to retrieve a single ride"""
+    try:
+        ride_id = int(ride_id)
+    except ValueError:
+        ride_id = ride_id
+
+    if type(ride_id) is not int:
+        abort(400, 'Make sure the ride id is an integer')
+
+    access_token = request.headers.get('Authorization')
+    if access_token:
+        token_good = verify_token(access_token)
+        if not token_good[0]:
+            abort(401, token_good[1])
+
+        ride = Ride.get_one_ride(ride_id)
+        if ride:
+            return jsonify({'ride': convert_ride_offer(ride)}), 200
+        else:
+            abort(400, 'Ride does not exist.')
+
+
 @app.route('/ridemyway/api/v1/users/rides', methods=['POST'])
 def create_ride():
     """Endpoint for creating a new ride offer"""
