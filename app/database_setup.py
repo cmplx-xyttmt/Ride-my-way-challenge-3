@@ -17,13 +17,14 @@ def create_tables():
         """,
         """
         CREATE TABLE IF NOT EXISTS rides (
-          ride_id INTEGER PRIMARY KEY ,
+          ride_id SERIAL PRIMARY KEY ,
           user_id INTEGER NOT NULL,
           FOREIGN KEY (user_id)
           REFERENCES users(user_id)
           ON UPDATE CASCADE ON DELETE CASCADE,
           origin VARCHAR(255) NOT NULL,
-          destination VARCHAR(255) NOT NULL 
+          destination VARCHAR(255) NOT NULL,
+          price INTEGER NOT NULL 
         )
         """,
         """
