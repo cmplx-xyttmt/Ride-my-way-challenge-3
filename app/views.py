@@ -49,8 +49,12 @@ def signup():
     user = User(username=username)
     user.hash_password(password)
     user_id = user.add_new_user()
-    print(user_id)
-    return jsonify({'username': user.username}), 201
+
+    response = {
+        'message': 'Signed up successfully',
+        'username': user.username
+    }
+    return make_response(jsonify(response)), 201
 
 
 @app.route('/ridemyway/api/v1/auth/token')
