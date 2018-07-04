@@ -190,8 +190,9 @@ def create_ride_request(ride_id):
             abort(401, token_good[1])
 
         username = token_good[1]
+        requester = User.get_user(username)
         ride_req = Request(username)
-        req_id = ride_req.add_ride_request(ride_id)
+        req_id = ride_req.add_ride_request(ride_id, requester.user_id)
         response = {
             'message': 'Ride request created successfully',
             'request_id': req_id,
