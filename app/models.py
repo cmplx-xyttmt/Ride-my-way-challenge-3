@@ -139,7 +139,8 @@ class Ride:
             if conn is not None:
                 conn.close()
 
-        return ride_id
+        self.id = ride_id
+        return self.id
 
     @staticmethod
     def get_one_ride(ride_id):
@@ -207,3 +208,38 @@ class Ride:
                 conn.close()
 
         return rides
+
+
+class Request:
+
+    def __init__(self, name):
+        self.id = 0  # Default id value
+        self.name = name  # Name of the requester
+        self.accepted = False
+        self.rejected = False
+
+    def add_ride_request(self, ride_id):
+        """Adds a new request into the database"""
+        sql = "INSERT INTO riderequests(ride_id, accepted, rejected)" \
+              "VALUES (%s, %s, %s) RETURNING request_id"
+
+        params = config()
+        if app.config['TESTING']:
+            params['database'] = 'ridemywaydb_testing'
+        create_tables()
+        conn = psycopg2.connect(**params)
+        cur = conn.cursor()
+        req_id = 0
+        try:
+            cur.execute(sql, (ride_id, self.accepted, self.rejected))
+            req_id = cur.fetchone()[0]
+            conn.commit()
+            cur.close()
+        except (Exception, psycopg2.DatabaseError) as error:
+            print(error)
+        finally:
+            if conn is not None:
+                conn.close()
+
+        self.id = req_id
+        return self.id
