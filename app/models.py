@@ -91,3 +91,37 @@ class User:
         token = jwt.encode(payload, app.config['SECRET'], algorithm='HS256')
 
         return token
+
+
+class Ride:
+
+    def __init__(self, name, origin, destination, price=0):
+        self.name = name
+        self.origin = origin
+        self.destination = destination
+        self.price = price
+        self.requests = []
+
+    def create_new_ride_offer(self, user_id):
+        """Adds a new ride offer associated with a specific user"""
+        sql = "INSERT INTO rides(user_id, origin, destination, price)" \
+              "values (%s, %s, %s, %s) RETURNING ride_id"
+        params = config()
+        if app.config['TESTING']:
+            params['database'] = 'ridemywaydb_testing'
+        create_tables()
+        conn = psycopg2.connect(**params)
+        cur = conn.cursor()
+        ride_id = None
+        try:
+            cur.execute(sql, (user_id, self.origin, self.destination, self.price))
+            ride_id = cur.fetchone()[0]
+            conn.commit()
+            cur.close()
+        except (Exception, psycopg2.DatabaseError) as error:
+            print(error)
+        finally:
+            if conn is not None:
+                conn.close()
+
+        return ride_id

@@ -8,8 +8,7 @@ rides = []
 
 
 @app.route('/ridemyway/api/v1/rides', methods=['GET'])
-@auth.login_required
-def get_ride():
+def get_rides():
     rides_as_dicts = [convert_ride_offer(ride) for ride in rides]
     return jsonify({'rides': rides_as_dicts})
 
@@ -52,7 +51,8 @@ def signup():
 
     response = {
         'message': 'Signed up successfully',
-        'username': user.username
+        'username': user.username,
+        'id': user_id
     }
     return make_response(jsonify(response)), 201
 
