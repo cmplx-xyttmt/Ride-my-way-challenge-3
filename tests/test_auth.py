@@ -75,6 +75,27 @@ class TestAuth(unittest.TestCase):
         self.assertIn('message', data)
         self.assertEqual(data['message'], 'Please provide an access token')
 
+    def test_rides_with_wrong_auth(self):
+        """Tests whether a user can access rides with a wrong auth token"""
+        resp = self.sign_up_user(self.user)
+        self.assertEqual(201, resp.status_code)
+        resp = self.login_user(self.user)
+        self.assertEqual(200, resp.status_code)
+        data = json.loads(str(resp.data.decode()))
+        self.assertIn('access_token', data)
+
+        # Add some characters to make the token invalid
+        token = data['access_token'] + "isaac"
+        resp = self.client.get("/ridemyway/api/v1/rides",
+                               headers={'Authorization': token})
+
+        data = json.loads(str(resp.data.decode()))
+        self.assertEqual(401, resp.status_code)
+        self.assertIn('error', data)
+        self.assertIn('message', data)
+        self.assertEqual(data['message'],
+                         'Invalid token. Please register or login')
+
     def tearDown(self):
         """Deletes the tables in the database after using it for testing"""
         sql = "DROP SCHEMA public CASCADE"
