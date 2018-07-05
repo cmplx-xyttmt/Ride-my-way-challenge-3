@@ -59,9 +59,16 @@ The following are the api endpoints implemented:
 |POST|/auth/signup|True|Register user|
 |POST|/auth/login|True|Login user|
 
-### End points for ride offers
+### Endpoints for ride offers
 | HTTP Method | Endpoint | Public | Action |
 |:-----------:|:--------:|:------:|:------:|  
 |GET|/rides|False|Get all available rides|
-|GET|/rides/rideId|False|Fetch the details of a single ride offer|
+|GET|/rides/\<rideId\>|False|Fetch the details of a single ride offer|
 |POST|/users/rides|False|Create a ride offer|
+
+### Endpoints for ride requests
+| HTTP Method | Endpoint | Public | Action |
+|:-----------:|:--------:|:------:|:------:|  
+|POST|/rides/\<rideId\>/requests|False|Make ride request|
+|GET|/users/rides/\<rideId\>/requests|False|Fetch all ride requests|
+|PUT|/users/rides/\<rideId\>/requests/\<requestId\>|False|Accept or reject a ride request|
