@@ -240,6 +240,65 @@ def view_ride_requests(ride_id):
         abort(401, 'Please provide an access token')
 
 
+@app.route('/ridemyway/api/v1/users/rides/<ride_id>/requests/<request_id>', methods=['PUT'])
+def accept_reject_request(ride_id, request_id):
+    try:
+        ride_id = int(ride_id)
+    except ValueError:
+        ride_id = ride_id
+
+    if type(ride_id) is not int:
+        abort(400, 'Make sure the ride id is an integer')
+
+    access_token = request.headers.get('Authorization')
+    if access_token:
+        token_good = verify_token(access_token)
+        if not token_good[0]:
+            abort(401, token_good[1])
+
+        username = token_good[1]
+        ride = Ride.get_one_ride(ride_id)
+
+        #  Check if this user is the one that created the ride request
+        if ride.name == username:
+            if not request.is_json:
+                abort(400, 'Make sure your request contains json data')
+
+            data = request.get_json()
+            if 'decision' not in data:
+                abort(400,
+                      'Make sure you have a decision key in your request')
+            decision = data['decision']
+            if not (decision == "accept" or decision == "reject"):
+                abort(400,
+                      'Specify your decision by setting the'
+                      ' decision key to accept or reject'
+                      )
+
+            success = Request.accept_reject_ride_request(decision, request_id)
+            if success:
+                if decision == 'accept':
+                    message = 'You have accepted this ride request'
+                else:
+                    message = 'You have rejected this ride request'
+
+                response = {
+                    'status': message
+                }
+            else:
+                response = {
+                    'status': 'Failed to accept or reject the ride request'
+                }
+            return make_response(jsonify(response)), 200
+        else:
+            abort(401,
+                  'You are not authorized to respond to this '
+                  'ride request because you did not create this ride offer.')
+
+    else:
+        abort(401, 'Please provide an access token')
+
+
 def verify_token(access_token):
     """Determine if the access token is correct"""
     username = User.decode_token(access_token)
