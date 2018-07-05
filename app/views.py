@@ -326,13 +326,13 @@ def bad_request(error):
 @app.errorhandler(409)
 def conflict(error):
     return make_response(jsonify({"error": 'Conflict.',
-                                  'message': error.description}))
+                                  'message': error.description}), 409)
 
 
 @app.errorhandler(401)
 def unauthorized(error):
     return make_response(jsonify({"error": 'Unauthorized access.',
-                                  'message': error.description}))
+                                  'message': error.description}), 401)
 
 
 @app.errorhandler(405)
@@ -340,4 +340,4 @@ def method_not_allowed(error):
     message = "{} Check the documentation for allowed methods".\
         format(error.description)
     return make_response(jsonify({"error": 'Method not allowed',
-                                  "message": message}))
+                                  "message": message}), 405)
