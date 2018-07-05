@@ -240,7 +240,8 @@ def view_ride_requests(ride_id):
         abort(401, 'Please provide an access token')
 
 
-@app.route('/ridemyway/api/v1/users/rides/<ride_id>/requests/<request_id>', methods=['PUT'])
+@app.route('/ridemyway/api/v1/users/rides/<ride_id>/requests/<request_id>',
+           methods=['PUT'])
 def accept_reject_request(ride_id, request_id):
     try:
         ride_id = int(ride_id)
@@ -336,8 +337,7 @@ def unauthorized(error):
 
 @app.errorhandler(405)
 def method_not_allowed(error):
+    message = "{} Check the documentation for allowed methods".\
+        format(error.description)
     return make_response(jsonify({"error": 'Method not allowed',
-                                  "message":
-                                      "{}"
-                                      "Check the documentation "
-                                      "for allowed methods".format(error.description)}))
+                                  "message": message}))
