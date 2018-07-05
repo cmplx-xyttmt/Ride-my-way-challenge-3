@@ -66,8 +66,23 @@ class TestAuth(unittest.TestCase):
         self.assertIn('access_token', data)
         self.assertEqual(data['message'], "Logged in successfully")
 
+    def test_rides_with_token(self):
+        """Tests whether a user can view rides when logged in"""
+        resp = self.sign_up_user(self.user)
+        self.assertEqual(201, resp.status_code)
+        resp = self.login_user(self.user)
+        self.assertEqual(200, resp.status_code)
+        data = json.loads(str(resp.data.decode()))
+        self.assertIn('access_token', data)
+
+        token = data['access_token']
+        resp = self.client.get("/ridemyway/api/v1/rides",
+                               headers={'Authorization': token})
+        data = json.loads(str(resp.data.decode()))
+        self.assertEqual(200, resp.status_code)
+
     def test_rides_no_auth_token(self):
-        """Tests whether a user can access rides without being logged in."""
+        """Tests whether a user can view rides without being logged in."""
         response = self.client.get("/ridemyway/api/v1/rides")
         self.assertEqual(401, response.status_code)
         data = json.loads(str(response.data.decode()))
@@ -76,7 +91,7 @@ class TestAuth(unittest.TestCase):
         self.assertEqual(data['message'], 'Please provide an access token')
 
     def test_rides_with_wrong_auth(self):
-        """Tests whether a user can access rides with a wrong auth token"""
+        """Tests whether a user can view rides with a wrong auth token"""
         resp = self.sign_up_user(self.user)
         self.assertEqual(201, resp.status_code)
         resp = self.login_user(self.user)
