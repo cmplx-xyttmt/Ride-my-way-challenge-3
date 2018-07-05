@@ -332,3 +332,12 @@ def conflict(error):
 def unauthorized(error):
     return make_response(jsonify({"error": 'Unauthorized access.',
                                   'message': error.description}))
+
+
+@app.errorhandler(405)
+def method_not_allowed(error):
+    return make_response(jsonify({"error": 'Method not allowed',
+                                  "message":
+                                      "{}"
+                                      "Check the documentation "
+                                      "for allowed methods".format(error.description)}))
