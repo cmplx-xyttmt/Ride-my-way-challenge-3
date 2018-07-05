@@ -259,6 +259,7 @@ class Request:
 
     @staticmethod
     def get_ride_requests(ride_id):
+        """Gets all the ride requests for a particular ride offer"""
         sql = "SELECT r.*, u.username FROM riderequests r " \
               "LEFT JOIN users u on r.passenger_id = u.user_id" \
               " WHERE r.ride_id = (%s)"
