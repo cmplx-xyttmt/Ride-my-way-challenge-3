@@ -299,8 +299,9 @@ class Request:
     @staticmethod
     def accept_reject_ride_request(decision, request_id):
         """Method to accept/reject a ride request"""
-        sql = "UPDATE riderequests r SET r.accepted = (%s), r.rejected = (%s)" \
-              "WHERE r.request_id = (%s)"
+        sql = "UPDATE riderequests SET " \
+              "accepted = (%s), rejected = (%s)" \
+              "WHERE riderequests.request_id = (%s)"
 
         params = config()
         if app.config['TESTING']:
@@ -318,6 +319,8 @@ class Request:
                 rejected = True
 
             cur.execute(sql, (accepted, rejected, request_id))
+            conn.commit()
+            cur.close()
             status = True
         except (Exception, psycopg2.DatabaseError) as error:
             print(error)
