@@ -2,7 +2,7 @@ import unittest
 import psycopg2
 from configure_database import config
 import json
-from app.models import User
+from app.models import User, Ride
 from app import app
 
 
@@ -14,7 +14,7 @@ class TestAuth(unittest.TestCase):
         self.user = User(username='Isaac', password='python')
         self.user2 = User(username='Owomugisha', password='java')
         self.user3 = User(username='Allen', password='cplusplus')
-        self.ride_1 = {}
+        self.ride_1 = Ride("Isaac", "Ibanda", "Kampala")
 
     def sign_up_user(self, user):
         """Helper method that issues the request to sign up a user"""
@@ -32,6 +32,18 @@ class TestAuth(unittest.TestCase):
         response = self.client.post("ridemyway/api/v1/auth/login",
                                     content_type="application/json",
                                     data=json.dumps(req_data))
+        return response
+
+    def create_ride(self, ride, token):
+        """Helper method that issues the request to create a new ride offer"""
+        req_data = {'name': ride.name,
+                    'origin': ride.origin,
+                    'destination': ride.destination,
+                    'price': ride.price}
+        response = self.client.post("/ridemyway/api/v1/users/rides",
+                                    content_type="application/json",
+                                    data=json.dumps(req_data),
+                                    headers={'Authorization': token})
         return response
 
     def test_signup(self):
@@ -76,10 +88,13 @@ class TestAuth(unittest.TestCase):
         self.assertIn('access_token', data)
 
         token = data['access_token']
+        resp = self.create_ride(self.ride_1, token)
+        self.assertEqual(201, resp.status_code)
         resp = self.client.get("/ridemyway/api/v1/rides",
                                headers={'Authorization': token})
         data = json.loads(str(resp.data.decode()))
         self.assertEqual(200, resp.status_code)
+        self.assertIn("rides", data)
 
     def test_rides_no_auth_token(self):
         """Tests whether a user can view rides without being logged in."""
