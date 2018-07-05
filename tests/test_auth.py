@@ -12,6 +12,27 @@ class TestAuth(unittest.TestCase):
         app.config['TESTING'] = True
         self.client = app.test_client()
         self.user = User(username='Isaac', password='python')
+        self.user2 = User(username='Owomugisha', password='java')
+        self.user3 = User(username='Allen', password='cplusplus')
+        self.ride_1 = {}
+
+    def sign_up_user(self, user):
+        """Helper method that issues the request to sign up a user"""
+        req_data = {'username': user.username,
+                    'password': user.password_hash}
+        response = self.client.post("ridemyway/api/v1/auth/signup",
+                                    content_type="application/json",
+                                    data=json.dumps(req_data))
+        return response
+
+    def login_user(self, user):
+        """Helper method that issues the request to login a user"""
+        req_data = {'username': user.username,
+                    'password': user.password_hash}
+        response = self.client.post("ridemyway/api/v1/auth/login",
+                                    content_type="application/json",
+                                    data=json.dumps(req_data))
+        return response
 
     def test_signup(self):
         """Tests whether a new user can sign up"""
