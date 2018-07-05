@@ -1,0 +1,6 @@
+plugins:
+  pep8:
+    enabled: true
+engines:
+  pylint:
+    enabled: true
