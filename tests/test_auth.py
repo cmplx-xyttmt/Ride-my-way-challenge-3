@@ -126,6 +126,25 @@ class TestAuth(unittest.TestCase):
         self.assertEqual(data['message'],
                          'Invalid token. Please register or login')
 
+    def test_get_one_ride(self):
+        """Tests whether a user can view one ride"""
+        resp = self.sign_up_user(self.user)
+        self.assertEqual(201, resp.status_code)
+        resp = self.login_user(self.user)
+        self.assertEqual(200, resp.status_code)
+        data = json.loads(str(resp.data.decode()))
+        self.assertIn('access_token', data)
+        token = data['access_token']
+
+        resp = self.create_ride(self.ride_1, token)
+        self.assertEqual(201, resp.status_code)
+        resp = self.client.get("/ridemyway/api/v1/rides/{}".
+                               format(1),
+                               headers={'Authorization': token})
+        self.assertEqual(200, resp.status_code)
+        data = json.loads(str(resp.data.decode()))
+        self.assertIn('ride', data)
+
     def tearDown(self):
         """Deletes the tables in the database after using it for testing"""
         sql = "DROP SCHEMA public CASCADE"
