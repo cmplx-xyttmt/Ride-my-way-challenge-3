@@ -313,7 +313,7 @@ def verify_token(access_token):
 
 @app.errorhandler(404)
 def not_found(error):
-    return make_response(jsonify({"error": 'Ride Not Found',
+    return make_response(jsonify({"error": 'Resource Not Found',
                                   "message": error.description}), 404)
 
 
