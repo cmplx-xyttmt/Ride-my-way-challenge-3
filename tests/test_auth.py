@@ -66,6 +66,15 @@ class TestAuth(unittest.TestCase):
         self.assertIn('access_token', data)
         self.assertEqual(data['message'], "Logged in successfully")
 
+    def test_rides_no_auth_token(self):
+        """Tests whether a user can access rides without being logged in."""
+        response = self.client.get("/ridemyway/api/v1/rides")
+        self.assertEqual(401, response.status_code)
+        data = json.loads(str(response.data.decode()))
+        self.assertIn('error', data)
+        self.assertIn('message', data)
+        self.assertEqual(data['message'], 'Please provide an access token')
+
     def tearDown(self):
         """Deletes the tables in the database after using it for testing"""
         sql = "DROP SCHEMA public CASCADE"
