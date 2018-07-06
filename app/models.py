@@ -20,7 +20,7 @@ class User:
         self.cur = None
 
     def hash_password(self, password):
-        self.password_hash = pwd_context.encrypt(password)
+        self.password_hash = pwd_context.hash(password)
 
     def verify_password(self, password):
         return pwd_context.verify(password, self.password_hash)
@@ -104,7 +104,7 @@ class User:
     def decode_token(token):
         """Used to decode a token obtained from the authorization header"""
         try:
-            payload = jwt.decode(token, app.config['SECRET'])
+            payload = jwt.decode(token, app.config['SECRET'], algorithms='HS256')
             return payload['user']
         except jwt.ExpiredSignature:
             return "Token is expired. Please login again"
