@@ -46,6 +46,13 @@ class TestAuth(unittest.TestCase):
                                     headers={'Authorization': token})
         return response
 
+    def create_request(self, token):
+        """Helper method for creating ride requests"""
+        resp = self.client.post("/ridemyway/api/v1/rides/{}/requests".
+                                format(1),
+                                headers={'Authorization': token})
+        return resp
+
     def test_signup(self):
         """Tests whether a new user can sign up"""
         req_data = {'username': self.user.username,
