@@ -104,7 +104,9 @@ class User:
     def decode_token(token):
         """Used to decode a token obtained from the authorization header"""
         try:
-            payload = jwt.decode(token, app.config['SECRET'], algorithms='HS256')
+            payload = jwt.decode(token,
+                                 app.config['SECRET'],
+                                 algorithms='HS256')
             return payload['user']
         except jwt.ExpiredSignature:
             return "Token is expired. Please login again"
