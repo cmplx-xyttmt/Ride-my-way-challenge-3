@@ -13,6 +13,7 @@ class TestAuth(unittest.TestCase):
         self.client = app.test_client()
         self.user = User(username='Isaac', password='python')
         self.user2 = User(username='Owomugisha', password='java')
+        self.token = self.login_signup(self.user2)
         self.user3 = User(username='Allen', password='cplusplus')
         self.ride_1 = Ride("Isaac", "Ibanda", "Kampala")
 
@@ -33,6 +34,17 @@ class TestAuth(unittest.TestCase):
                                     content_type="application/json",
                                     data=json.dumps(req_data))
         return response
+
+    def login_signup(self, user):
+        """Helper method to login and sign up a user"""
+        resp = self.sign_up_user(user)
+        self.assertEqual(201, resp.status_code)
+        resp = self.login_user(user)
+        self.assertEqual(200, resp.status_code)
+        data = json.loads(str(resp.data.decode()))
+        self.assertIn('access_token', data)
+
+        return data['access_token']
 
     def create_ride(self, ride, token):
         """Helper method that issues the request to create a new ride offer"""
@@ -55,11 +67,7 @@ class TestAuth(unittest.TestCase):
 
     def test_signup(self):
         """Tests whether a new user can sign up"""
-        req_data = {'username': self.user.username,
-                    'password': "python"}
-        response = self.client.post("ridemyway/api/v1/auth/signup",
-                                    content_type="application/json",
-                                    data=json.dumps(req_data))
+        response = self.sign_up_user(self.user)
 
         self.assertEqual(response.status_code, 201)
         data = json.loads(str(response.data.decode()))
@@ -67,17 +75,10 @@ class TestAuth(unittest.TestCase):
 
     def test_login(self):
         """Tests if a user can login"""
-        req_data = {'username': self.user.username,
-                    'password': "python"}
 
         # First sign up the user
-        self.client.post("ridemyway/api/v1/auth/signup",
-                         content_type="application/json",
-                         data=json.dumps(req_data))
-
-        response = self.client.post("ridemyway/api/v1/auth/login",
-                                    content_type="application/json",
-                                    data=json.dumps(req_data))
+        self.sign_up_user(self.user)
+        response = self.login_user(self.user)
 
         self.assertEqual(response.status_code, 200)
         data = json.loads(str(response.data.decode()))
@@ -87,14 +88,7 @@ class TestAuth(unittest.TestCase):
 
     def test_rides_with_token(self):
         """Tests whether a user can view rides when logged in"""
-        resp = self.sign_up_user(self.user)
-        self.assertEqual(201, resp.status_code)
-        resp = self.login_user(self.user)
-        self.assertEqual(200, resp.status_code)
-        data = json.loads(str(resp.data.decode()))
-        self.assertIn('access_token', data)
-
-        token = data['access_token']
+        token = self.token
         resp = self.create_ride(self.ride_1, token)
         self.assertEqual(201, resp.status_code)
         resp = self.client.get("/ridemyway/api/v1/rides",
@@ -114,15 +108,8 @@ class TestAuth(unittest.TestCase):
 
     def test_rides_with_wrong_auth(self):
         """Tests whether a user can view rides with a wrong auth token"""
-        resp = self.sign_up_user(self.user)
-        self.assertEqual(201, resp.status_code)
-        resp = self.login_user(self.user)
-        self.assertEqual(200, resp.status_code)
-        data = json.loads(str(resp.data.decode()))
-        self.assertIn('access_token', data)
-
         # Add some characters to make the token invalid
-        token = data['access_token'] + "isaac"
+        token = self.token + "isaac"
         resp = self.client.get("/ridemyway/api/v1/rides",
                                headers={'Authorization': token})
 
@@ -135,13 +122,7 @@ class TestAuth(unittest.TestCase):
 
     def test_get_one_ride(self):
         """Tests whether a user can view one ride"""
-        resp = self.sign_up_user(self.user)
-        self.assertEqual(201, resp.status_code)
-        resp = self.login_user(self.user)
-        self.assertEqual(200, resp.status_code)
-        data = json.loads(str(resp.data.decode()))
-        self.assertIn('access_token', data)
-        token = data['access_token']
+        token = self.token
 
         resp = self.create_ride(self.ride_1, token)
         self.assertEqual(201, resp.status_code)
@@ -154,13 +135,7 @@ class TestAuth(unittest.TestCase):
 
     def test_create_ride_request(self):
         """Tests whether a user can create a ride request"""
-        resp = self.sign_up_user(self.user)
-        self.assertEqual(201, resp.status_code)
-        resp = self.login_user(self.user)
-        self.assertEqual(200, resp.status_code)
-        data = json.loads(str(resp.data.decode()))
-        self.assertIn('access_token', data)
-        token = data['access_token']
+        token = self.token
 
         resp = self.create_ride(self.ride_1, token)
         self.assertEqual(201, resp.status_code)
@@ -175,13 +150,7 @@ class TestAuth(unittest.TestCase):
 
     def test_view_ride_requests(self):
         """Tests whether a user that created a ride request can view the ride requests"""
-        resp = self.sign_up_user(self.user)
-        self.assertEqual(201, resp.status_code)
-        resp = self.login_user(self.user)
-        self.assertEqual(200, resp.status_code)
-        data = json.loads(str(resp.data.decode()))
-        self.assertIn('access_token', data)
-        token = data['access_token']
+        token = self.token
 
         resp = self.create_ride(self.ride_1, token)
         self.assertEqual(201, resp.status_code)
