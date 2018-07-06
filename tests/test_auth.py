@@ -163,6 +163,24 @@ class TestAuth(unittest.TestCase):
         data = json.loads(str(resp.data.decode()))
         self.assertIn('ride_requests', data)
 
+    def test_accept_reject_request(self):
+        token = self.token
+        resp = self.create_ride(self.ride_1, token)
+        self.assertEqual(201, resp.status_code)
+        resp = self.create_request(token)
+        self.assertEqual(201, resp.status_code)
+
+        req = {"decision": "accept"}
+        resp = self.client.put("/ridemyway/api/v1/users/rides/{}/requests/{}"
+                               .format(1, 1),
+                               content_type="application/json",
+                               data=json.dumps(req),
+                               headers={"Authorization": token})
+
+        self.assertEqual(200, resp.status_code)
+        data = json.loads(str(resp.data.decode()))
+        self.assertIn('status', data)
+
     def tearDown(self):
         """Deletes the tables in the database after using it for testing"""
         sql = "DROP SCHEMA public CASCADE"
