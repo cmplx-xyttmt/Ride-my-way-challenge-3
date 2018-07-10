@@ -26,16 +26,6 @@ class User:
     def verify_password(self, password):
         return pwd_context.verify(password, self.password_hash)
 
-    def initiate_connection(self):
-        """Initiates a connection to the database and sets the cursor"""
-        params = config()
-        if app.config['TESTING']:
-            params['database'] = 'ridemywaydb_testing'
-
-        create_tables()
-        self.conn = psycopg2.connect(**params)
-        self.cur = self.conn.cursor()
-
     def add_new_user(self):
         """Adds a new user to the database"""
         database_conn = Database()
