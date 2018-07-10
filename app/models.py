@@ -39,7 +39,10 @@ class User:
                   self.rides_given,
                   self.rides_taken)
 
-        data_returned = database_conn.insert("users", columns, values, "user_id")
+        data_returned = database_conn.insert("users",
+                                             columns,
+                                             values,
+                                             "user_id")
         user_id = None
         for row in data_returned:
             user_id = row[0]
