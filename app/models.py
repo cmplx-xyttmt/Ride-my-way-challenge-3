@@ -4,6 +4,7 @@ from configure_database import config
 from app.database_setup import create_tables
 import jwt
 import datetime
+from app.database_helper import Database
 from app import app
 
 
@@ -37,24 +38,21 @@ class User:
 
     def add_new_user(self):
         """Adds a new user to the database"""
-        sql = "INSERT  INTO users (username, user_password, " \
-              "rides_taken, rides_given)" \
-              "VALUES (%s, %s, %s, %s) RETURNING user_id"
+        database_conn = Database()
+        columns = ("username",
+                   "user_password",
+                   "rides_taken",
+                   "rides_given")
+
+        values = (self.username,
+                  self.password_hash,
+                  self.rides_given,
+                  self.rides_taken)
+
+        data_returned = database_conn.insert("users", columns, values, "user_id")
         user_id = None
-        self.initiate_connection()
-        try:
-            self.cur.execute(sql, (self.username,
-                                   self.password_hash,
-                                   self.rides_given,
-                                   self.rides_taken))
-            user_id = self.cur.fetchone()[0]
-            self.conn.commit()
-            self.cur.close()
-        except (Exception, psycopg2.DatabaseError) as error:
-            print("Error: ", error)
-        finally:
-            if self.conn is not None:
-                self.conn.close()
+        for row in data_returned:
+            user_id = row[0]
 
         return user_id
 
