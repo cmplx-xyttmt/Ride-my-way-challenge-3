@@ -28,6 +28,25 @@ class Database:
         if returning:
             sql = sql + " RETURNING " + returning
 
+        return_val = self.execute_sql(sql)
+        return return_val
+
+    def select(self, table, columns, left_join=None, where=None):
+        """
+        Selects elements in the database using the select statement
+        """
+        columns = str(columns).replace("\'", "")
+        sql = "SELECT " + columns + " FROM " + table
+        if left_join:
+            sql = sql + " LEFT JOIN " + left_join
+        if where:
+            sql = sql + " WHERE " + where
+
+        return_val = self.execute_sql(sql)
+        return return_val
+
+    def execute_sql(self, sql):
+        """Executes the sql statement and returns the values from the database"""
         return_val = None
         try:
             self.cur.execute(sql)
