@@ -248,33 +248,22 @@ class Request:
     @staticmethod
     def accept_reject_ride_request(decision, request_id):
         """Method to accept/reject a ride request"""
-        sql = "UPDATE riderequests SET " \
-              "accepted = (%s), rejected = (%s)" \
-              "WHERE riderequests.request_id = (%s)"
+        database_conn = Database()
+        if decision == 'accept':
+            accepted = True
+            rejected = False
+        else:
+            accepted = False
+            rejected = True
 
-        params = config()
-        if app.config['TESTING']:
-            params['database'] = 'ridemywaydb_testing'
-        create_tables()
-        conn = psycopg2.connect(**params)
-        cur = conn.cursor()
-        status = False
-        try:
-            if decision == 'accept':
-                accepted = True
-                rejected = False
-            else:
-                accepted = False
-                rejected = True
+        sett = "accepted = " + str(accepted)
+        where = "riderequests.request_id = " + str(request_id)
+        sett = sett + ", rejected = " + str(rejected)
+        return_val = database_conn.update("riderequests",
+                                          sett,
+                                          where)
 
-            cur.execute(sql, (accepted, rejected, request_id))
-            conn.commit()
-            cur.close()
-            status = True
-        except (Exception, psycopg2.DatabaseError) as error:
-            print(error)
-        finally:
-            if conn is not None:
-                conn.close()
-
-        return status
+        #  True means statement has been successfully executed
+        if return_val:
+            return True
+        return False
