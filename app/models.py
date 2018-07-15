@@ -144,6 +144,8 @@ class Ride:
                                              left_join,
                                              where)
         ride = None
+        if len(data_returned) == 0:
+            return ride
 
         for row in data_returned[0]:
             row = tuple(row.replace("(", "").replace(")", "").split(","))
@@ -169,6 +171,9 @@ class Ride:
                                              left_join)
 
         rides = []
+        if len(data_returned) == 0:
+            return rides
+
         for row in data_returned[0]:
             row = tuple(row.replace("(", "").replace(")", "").split(","))
             origin = row[2]
@@ -231,6 +236,9 @@ class Request:
                                              where)
 
         ride_requests = []
+        if len(data_returned) == 0:
+            return ride_requests
+
         for row in data_returned[0]:
             row = tuple(row.replace("(", "").replace(")", "").split(","))
             rq_name = row[5]
