@@ -53,32 +53,25 @@ class User:
     def get_user(username):
         """Gets a user from the database
         whose username matches the one given"""
-        sql = "SELECT * FROM users WHERE username = (%s)"
-        params = config()
-        if app.config['TESTING']:
-            params['database'] = 'ridemywaydb_testing'
-        create_tables()
-        conn = psycopg2.connect(**params)
-        cur = conn.cursor()
+        database_conn = Database()
+        columns = "*"
+        where = "username = \'" + username + "\'"
+        data_returned = database_conn.select("users",
+                                             columns,
+                                             where=where)
+
+        row = None
+        if len(data_returned) > 0:
+            row = data_returned[0]
         user = None
-        try:
-            cur.execute(sql, (username,))
-            row = cur.fetchone()
-            if row:
-                user_id = row[0]
-                username = row[1]
-                password = row[2]
-                rides_taken = row[3]
-                rides_given = row[4]
-                user = User(username, password, rides_taken, rides_given)
-                user.user_id = user_id
-            conn.commit()
-            cur.close()
-        except (Exception, psycopg2.DatabaseError) as error:
-            print("Error: ", error)
-        finally:
-            if conn is not None:
-                conn.close()
+        if row:
+            user_id = row[0]
+            username = row[1]
+            password = row[2]
+            rides_taken = row[3]
+            rides_given = row[4]
+            user = User(username, password, rides_taken, rides_given)
+            user.user_id = user_id
 
         return user
 
