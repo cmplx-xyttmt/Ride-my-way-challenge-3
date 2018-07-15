@@ -68,6 +68,8 @@ class Database:
             self.cur.execute(sql)
             if fetch:
                 return_val = self.cur.fetchall()
+            else:
+                return_val = ['Empty data']
             self.conn.commit()
             self.cur.close()
         except (Exception, psycopg2.DatabaseError) as error:
