@@ -219,30 +219,25 @@ class Request:
 
     def add_ride_request(self, ride_id, passenger_id):
         """Adds a new request into the database"""
-        sql = "INSERT INTO " \
-              "riderequests(ride_id, passenger_id, accepted, rejected)" \
-              "VALUES (%s, %s, %s, %s) RETURNING request_id"
+        database_conn = Database()
+        columns = ("ride_id",
+                   "passenger_id",
+                   "accepted",
+                   "rejected")
 
-        params = config()
-        if app.config['TESTING']:
-            params['database'] = 'ridemywaydb_testing'
-        create_tables()
-        conn = psycopg2.connect(**params)
-        cur = conn.cursor()
-        req_id = 0
-        try:
-            cur.execute(sql, (ride_id,
-                              passenger_id,
-                              self.accepted,
-                              self.rejected))
-            req_id = cur.fetchone()[0]
-            conn.commit()
-            cur.close()
-        except (Exception, psycopg2.DatabaseError) as error:
-            print(error)
-        finally:
-            if conn is not None:
-                conn.close()
+        values = (ride_id,
+                  passenger_id,
+                  self.accepted,
+                  self.rejected)
+
+        data_returned = database_conn.insert("riderequests",
+                                             columns,
+                                             values,
+                                             "request_id")
+
+        req_id = None
+        for row in data_returned:
+            req_id = row[0]
 
         self.id = req_id
         return self.id
