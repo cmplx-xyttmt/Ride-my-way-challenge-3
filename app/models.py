@@ -1,7 +1,4 @@
-import psycopg2
 from passlib.apps import custom_app_context as pwd_context
-from configure_database import config
-from app.database_setup import create_tables
 import jwt
 import datetime
 from app.database_helper import Database
