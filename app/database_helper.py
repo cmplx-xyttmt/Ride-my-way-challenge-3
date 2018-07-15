@@ -54,7 +54,8 @@ class Database:
         return return_val
 
     def execute_sql(self, sql, fetch=True):
-        """Executes the sql statement and returns the values from the database"""
+        """Executes the sql statement and returns
+        the values from the database"""
         return_val = None
         try:
             self.cur.execute(sql)
