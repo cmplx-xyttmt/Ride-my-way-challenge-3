@@ -58,7 +58,7 @@ class User:
                                              where=where)
 
         row = None
-        if len(data_returned) > 0:
+        if data_returned and len(data_returned) > 0:
             row = data_returned[0]
         user = None
         if row:
