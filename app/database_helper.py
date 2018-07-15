@@ -45,12 +45,21 @@ class Database:
         return_val = self.execute_sql(sql)
         return return_val
 
-    def execute_sql(self, sql):
+    def update(self, table, sett, where=None):
+        sql = "UPDATE " + table + " SET " + sett
+        if where:
+            sql = sql + " WHERE " + where
+
+        return_val = self.execute_sql(sql, fetch=False)
+        return return_val
+
+    def execute_sql(self, sql, fetch=True):
         """Executes the sql statement and returns the values from the database"""
         return_val = None
         try:
             self.cur.execute(sql)
-            return_val = self.cur.fetchall()
+            if fetch:
+                return_val = self.cur.fetchall()
             self.conn.commit()
             self.cur.close()
         except (Exception, psycopg2.DatabaseError) as error:
