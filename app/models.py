@@ -162,35 +162,25 @@ class Ride:
     @staticmethod
     def get_all_rides():
         """Retrieves all the rides from the database"""
-        sql = "SELECT r.*, u.username FROM rides r " \
-              "LEFT JOIN users u ON (u.user_id=r.user_id)"
+        database_conn = Database()
+        columns = ("r.*", "u.username")
+        table = "rides r"
+        left_join = "users u on (u.user_id=r.user_id)"
 
-        params = config()
-        if app.config['TESTING']:
-            params['database'] = 'ridemywaydb_testing'
-        create_tables()
-        conn = psycopg2.connect(**params)
-        cur = conn.cursor()
+        data_returned = database_conn.select(table,
+                                             columns,
+                                             left_join)
+
         rides = []
-        try:
-            cur.execute(sql)
-            row = cur.fetchone()
-            while row:
-                origin = row[2]
-                destination = row[3]
-                price = row[4]
-                username = row[5]
-                new_ride = Ride(username, origin, destination, price)
-                new_ride.id = row[0]
-                rides.append(new_ride)
-                row = cur.fetchone()
-            conn.commit()
-            cur.close()
-        except (Exception, psycopg2.DatabaseError) as error:
-            print(error)
-        finally:
-            if conn is not None:
-                conn.close()
+        for row in data_returned[0]:
+            row = tuple(row.replace("(", "").replace(")", "").split(","))
+            origin = row[2]
+            destination = row[3]
+            price = row[4]
+            username = row[5]
+            new_ride = Ride(username, origin, destination, price)
+            new_ride.id = row[0]
+            rides.append(new_ride)
 
         return rides
 
