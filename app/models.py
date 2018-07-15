@@ -117,28 +117,25 @@ class Ride:
 
     def add_new_ride_offer(self, user_id):
         """Adds a new ride offer associated with a specific user"""
-        sql = "INSERT INTO rides(user_id, origin, destination, price)" \
-              "values (%s, %s, %s, %s) RETURNING ride_id"
-        params = config()
-        if app.config['TESTING']:
-            params['database'] = 'ridemywaydb_testing'
-        create_tables()
-        conn = psycopg2.connect(**params)
-        cur = conn.cursor()
-        ride_id = 0
-        try:
-            cur.execute(sql, (user_id,
-                              self.origin,
-                              self.destination,
-                              self.price))
-            ride_id = cur.fetchone()[0]
-            conn.commit()
-            cur.close()
-        except (Exception, psycopg2.DatabaseError) as error:
-            print(error)
-        finally:
-            if conn is not None:
-                conn.close()
+        database_conn = Database()
+        columns = ("user_id",
+                   "origin",
+                   "destination",
+                   "price")
+
+        values = (user_id,
+                  self.origin,
+                  self.destination,
+                  self.price)
+
+        data_returned = database_conn.insert("rides",
+                                             columns,
+                                             values,
+                                             "ride_id")
+
+        ride_id = None
+        for row in data_returned:
+            ride_id = row[0]
 
         self.id = ride_id
         return self.id

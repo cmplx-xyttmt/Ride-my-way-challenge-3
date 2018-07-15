@@ -20,7 +20,7 @@ class Database:
     def insert(self, table, columns, values, returning=None):
         """
         Inserts elements into a table given columns and values
-        Returns the value returned after executing the sql statement
+        Returns the values returned after executing the sql statement
         """
         columns = str(columns).replace("\'", "")
         values = str(values)
