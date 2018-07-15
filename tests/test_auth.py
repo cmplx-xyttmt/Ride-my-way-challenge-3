@@ -180,6 +180,8 @@ class TestAuth(unittest.TestCase):
         self.assertEqual(200, resp.status_code)
         data = json.loads(str(resp.data.decode()))
         self.assertIn('status', data)
+        self.assertEqual(data['status'],
+                         'You have accepted this ride request')
 
     def tearDown(self):
         """Deletes the tables in the database after using it for testing"""
