@@ -1,4 +1,5 @@
 import psycopg2
+import os
 from configure_database import config
 from app.database_setup import create_tables
 from app import app
@@ -14,7 +15,13 @@ class Database:
             params['database'] = 'ridemywaydb_testing'
 
         create_tables()
-        self.conn = psycopg2.connect(**params)
+        if 'DATABASE_URL' in os.environ:
+            database_url = os.environ['DATABASE_URL']
+            print(database_url)
+            self.conn = psycopg2.connect(database_url,
+                                         sslmode='require')
+        else:
+            self.conn = psycopg2.connect(**params)
         self.cur = self.conn.cursor()
 
     def insert(self, table, columns, values, returning=None):
