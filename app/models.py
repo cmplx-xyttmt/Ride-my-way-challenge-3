@@ -136,33 +136,26 @@ class Ride:
     @staticmethod
     def get_one_ride(ride_id):
         """Gets only one ride"""
-        sql = "SELECT r.*, u.username FROM rides r " \
-              "LEFT JOIN users u ON (u.user_id=r.user_id)" \
-              "WHERE r.ride_id = (%s)"
+        database_conn = Database()
+        columns = ("r.*", "u.username")
+        table = "rides r"
+        left_join = "users u on (u.user_id=r.user_id)"
+        where = "r.ride_id = " + str(ride_id)
 
-        params = config()
-        if app.config['TESTING']:
-            params['database'] = 'ridemywaydb_testing'
-        create_tables()
-        conn = psycopg2.connect(**params)
-        cur = conn.cursor()
+        data_returned = database_conn.select(table,
+                                             columns,
+                                             left_join,
+                                             where)
         ride = None
-        try:
-            cur.execute(sql, (ride_id,))
-            row = cur.fetchone()
-            if row:
-                origin = row[2]
-                destination = row[3]
-                price = row[4]
-                username = row[5]
-                new_ride = Ride(username, origin, destination, price)
-                new_ride.id = row[0]
-                ride = new_ride
-        except (Exception, psycopg2.DatabaseError) as error:
-            print(error)
-        finally:
-            if conn is not None:
-                conn.close()
+
+        for row in data_returned[0]:
+            row = tuple(row.replace("(", "").replace(")", "").split(","))
+            origin = row[2]
+            destination = row[3]
+            price = row[4]
+            username = row[5]
+            ride = Ride(username, origin, destination, price)
+            ride.id = row[0]
 
         return ride
 
@@ -252,6 +245,7 @@ class Request:
 
         ride_requests = []
         for row in data_returned[0]:
+            row = tuple(row.replace("(", "").replace(")", "").split(","))
             rq_name = row[5]
             ride_req = Request(rq_name)
             ride_req.id = row[0]
