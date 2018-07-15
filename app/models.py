@@ -245,39 +245,26 @@ class Request:
     @staticmethod
     def get_ride_requests(ride_id):
         """Gets all the ride requests for a particular ride offer"""
-        sql = "SELECT r.*, u.username FROM riderequests r " \
-              "LEFT JOIN users u on r.passenger_id = u.user_id" \
-              " WHERE r.ride_id = (%s)"
+        columns = ("r.*",
+                   "u.username")
 
-        params = config()
-        if app.config['TESTING']:
-            params['database'] = 'ridemywaydb_testing'
-        create_tables()
-        conn = psycopg2.connect(**params)
-        cur = conn.cursor()
+        table = "riderequests r"
+        left_join = "users u on r.passenger_id = u.user_id"
+        where = "r.ride_id = " + str(ride_id)
+        database_conn = Database()
+        data_returned = database_conn.select(table,
+                                             columns,
+                                             left_join,
+                                             where)
+
         ride_requests = []
-        try:
-            cur.execute(sql, (ride_id, ))
-            row = cur.fetchone()
-            while row:
-                rq_id = row[0]
-                rq_acc = row[3]
-                rq_rej = row[4]
-                rq_name = row[5]
-                ride_req = Request(rq_name)
-                ride_req.id = rq_id
-                ride_req.accepted = rq_acc
-                ride_req.rejected = rq_rej
-                ride_requests.append(ride_req)
-                row = cur.fetchone()
-
-            conn.commit()
-            cur.close()
-        except (Exception, psycopg2.DatabaseError) as error:
-            print(error)
-        finally:
-            if conn is not None:
-                conn.close()
+        for row in data_returned[0]:
+            rq_name = row[5]
+            ride_req = Request(rq_name)
+            ride_req.id = row[0]
+            ride_req.accepted = row[3]
+            ride_req.rejected = row[4]
+            ride_requests.append(ride_req)
 
         return ride_requests
 
