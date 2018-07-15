@@ -221,6 +221,8 @@ def view_ride_requests(ride_id):
 
         username = token_good[1]
         ride = Ride.get_one_ride(ride_id)
+        if not ride:
+            abort(400, 'Ride does not exist.')
 
         #  Check if this user is the one that created the ride request
         if ride.name == username:
