@@ -1,6 +1,7 @@
 import psycopg2
 from configure_database import config
 from app import app
+import os
 
 
 def create_tables():
@@ -50,7 +51,14 @@ def create_tables():
         params = config()
         if app.config['TESTING']:
             params['database'] = 'ridemywaydb_testing'
-        conn = psycopg2.connect(**params)
+
+        if 'DATABASE_URL' in os.environ:
+            database_url = os.environ['DATABASE_URL']
+            print(database_url)
+            conn = psycopg2.connect(database_url,
+                                    sslmode='require')
+        else:
+            conn = psycopg2.connect(**params)
         cur = conn.cursor()
 
         # create the tables one by one

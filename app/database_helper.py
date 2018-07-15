@@ -14,6 +14,7 @@ class Database:
         if app.config['TESTING']:
             params['database'] = 'ridemywaydb_testing'
 
+        create_tables()
         if 'DATABASE_URL' in os.environ:
             database_url = os.environ['DATABASE_URL']
             print(database_url)
@@ -21,8 +22,6 @@ class Database:
                                          sslmode='require')
         else:
             self.conn = psycopg2.connect(**params)
-
-        create_tables()
         self.cur = self.conn.cursor()
 
     def insert(self, table, columns, values, returning=None):
