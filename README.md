@@ -83,5 +83,6 @@ The following are the api endpoints implemented:
 
 
 ## Hosting and documentation
-The API is hotsed at [ride my way api](https://ridemywayapidb.herokuapp.com/ridemyway/api/v1/)
+The API is hosted at [ride my way api](https://ridemywayapidb.herokuapp.com/ridemyway/api/v1/).
+
 Append the endpoints above to the url to access the resources.
