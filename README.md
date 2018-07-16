@@ -80,3 +80,8 @@ The following are the api endpoints implemented:
 |POST|/rides/\<rideId\>/requests|False|Make ride request|
 |GET|/users/rides/\<rideId\>/requests|False|Fetch all ride requests|
 |PUT|/users/rides/\<rideId\>/requests/\<requestId\>|False|Accept or reject a ride request|
+
+
+## Hosting and documentation
+The API is hotsed at [ride my way api](https://ridemywayapidb.herokuapp.com/ridemyway/api/v1/)
+Append the endpoints above to the url to access the resources.
