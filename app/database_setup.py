@@ -13,7 +13,8 @@ def create_tables():
           username VARCHAR(255) NOT NULL,
           user_password VARCHAR(255) NOT NULL,
           rides_taken INTEGER,
-          rides_given INTEGER
+          rides_given INTEGER,
+          email TEXT NOT NULL
         )
         """,
         """
