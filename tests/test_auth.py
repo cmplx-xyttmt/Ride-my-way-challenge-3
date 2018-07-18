@@ -13,7 +13,7 @@ class TestAuth(unittest.TestCase):
         self.client = app.test_client()
         self.user = User(username='Isaac', password='python')
         self.user.email = "isaac@gmail.com"
-        self.user2 = User(username='Owomugisha', password='java')
+        self.user2 = User(username='Owomugisha', password='javac')
         self.user2.email = "owomugisha@gmail.com"
         self.token = self.login_signup(self.user2)
         self.user3 = User(username='Allen', password='cplusplus')
