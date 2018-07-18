@@ -1,6 +1,7 @@
 from app import app
 from app.models import User, Ride, Request
 from flask import request, abort, jsonify, make_response
+from app.validators import Validate
 
 
 def convert_ride_offer(ride_offer):
@@ -30,6 +31,16 @@ def signup():
             password is None or \
             email is None:
         abort(400, 'Missing arguments')
+
+    val = Validate.validate_username(username)
+    if not val[0]:
+        abort(401, val[1])
+    val = Validate.validate_password(password)
+    if not val[0]:
+        abort(401, val[1])
+    val = Validate.validate_email(email)
+    if not val[0]:
+        abort(401, val[1])
 
     user = User.get_user(username)
     if user:
@@ -67,6 +78,13 @@ def login():
             'message': 'Make sure you enter a username and a password'
         }
         return make_response(jsonify(response)), 401
+
+    val = Validate.validate_username(username)
+    if not val[0]:
+        abort(401, val[1])
+    val = Validate.validate_password(password)
+    if not val[0]:
+        abort(401, val[1])
 
     user = User.get_user(username)
 
