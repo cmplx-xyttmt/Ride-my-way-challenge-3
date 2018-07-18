@@ -25,7 +25,10 @@ def signup():
 
     username = json_request['username']
     password = json_request['password']
-    if username is None or password is None:
+    email = json_request['email']
+    if username is None or \
+            password is None or \
+            email is None:
         abort(400, 'Missing arguments')
 
     user = User.get_user(username)
@@ -38,12 +41,14 @@ def signup():
 
     user = User(username=username)
     user.hash_password(password)
+    user.email = email
     user_id = user.add_new_user()
 
     response = {
         'message': 'Signed up successfully',
         'username': user.username,
-        'id': user_id
+        'id': user_id,
+        'email': email
     }
     return make_response(jsonify(response)), 201
 
