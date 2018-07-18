@@ -12,6 +12,7 @@ class User:
         self.username = username
         self.user_id = 0  # Default value
         self.password_hash = password
+        self.email = None  # Default value
         self.rides_taken = rides_taken
         self.rides_given = rides_given
         self.conn = None
@@ -29,12 +30,14 @@ class User:
         columns = ("username",
                    "user_password",
                    "rides_taken",
-                   "rides_given")
+                   "rides_given",
+                   "email")
 
         values = (self.username,
                   self.password_hash,
+                  self.rides_taken,
                   self.rides_given,
-                  self.rides_taken)
+                  self.email)
 
         data_returned = database_conn.insert("users",
                                              columns,
@@ -67,7 +70,9 @@ class User:
             password = row[2]
             rides_taken = row[3]
             rides_given = row[4]
+            email = row[5]
             user = User(username, password, rides_taken, rides_given)
+            user.email = email
             user.user_id = user_id
 
         return user
