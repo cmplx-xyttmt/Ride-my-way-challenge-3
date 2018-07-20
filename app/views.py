@@ -182,6 +182,7 @@ def create_ride():
                           data['destination'],
                           data.get('price', 0))
 
+        print(username)
         user = User.get_user(username)
         ride_id = ride_offer.add_new_ride_offer(user.user_id)
         response = {
