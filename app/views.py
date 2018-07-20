@@ -171,14 +171,13 @@ def create_ride():
             abort(400, 'Make sure your request contains json data')
 
         data = request.get_json()
-        if 'name' not in data or \
-                'origin' not in data or \
+        if 'origin' not in data or \
                 'destination' not in data:
             abort(400,
                   'Make sure you have specified name, '
                   'origin and destination attributes in your json request.')
 
-        ride_offer = Ride(data['name'],
+        ride_offer = Ride(username,
                           data['origin'],
                           data['destination'],
                           data.get('price', 0))
