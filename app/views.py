@@ -365,9 +365,3 @@ def method_not_allowed(error):
         format(error.description)
     return make_response(jsonify({"error": 'Method not allowed',
                                   "message": message}), 405)
-
-
-@app.errorhandler(500)
-def internal_server_error(error):
-    return make_response(jsonify({"error": "Internal Server Error",
-                                  "message": error.description}), 500)
