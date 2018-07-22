@@ -171,7 +171,7 @@ class Ride:
         table = "rides r"
         left_join = "users u on (u.user_id=r.user_id)"
         if where:
-            where = 'u.username = ' + where
+            where = 'u.username = \'' + where + '\''
 
         data_returned = database_conn.select(table,
                                              columns,
