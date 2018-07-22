@@ -134,7 +134,7 @@ def get_my_rides():
     if access_token:
         token_good = verify_token(access_token)
         if not token_good[0]:
-            abort(401, token_good[1])#
+            abort(401, token_good[1])
 
         username = token_good[1]
 
