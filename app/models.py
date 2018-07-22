@@ -164,16 +164,19 @@ class Ride:
         return ride
 
     @staticmethod
-    def get_all_rides():
+    def get_all_rides(where=None):
         """Retrieves all the rides from the database"""
         database_conn = Database()
         columns = ("r.*", "u.username")
         table = "rides r"
         left_join = "users u on (u.user_id=r.user_id)"
+        if where:
+            where = 'u.username = ' + where
 
         data_returned = database_conn.select(table,
                                              columns,
-                                             left_join)
+                                             left_join,
+                                             where)
 
         rides = []
         if len(data_returned) == 0:

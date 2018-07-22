@@ -127,6 +127,24 @@ def get_rides():
         abort(401, 'Please provide an access token')
 
 
+@app.route('/ridemyway/api/v1/user/rides', methods=['GET'])
+def get_my_rides():
+    """API endpoint for getting a particular users rides"""
+    access_token = request.headers.get('Authorization')
+    if access_token:
+        token_good = verify_token(access_token)
+        if not token_good[0]:
+            abort(401, token_good[1])#
+
+        username = token_good[1]
+
+        ride_offers = Ride.get_all_rides(username)
+        rides_as_dicts = [convert_ride_offer(ride) for ride in ride_offers]
+        return jsonify({'rides': rides_as_dicts}), 200
+    else:
+        abort(401, 'Please provide an access token')
+
+
 @app.route('/ridemyway/api/v1/rides/<ride_id>')
 def get_ride(ride_id):
     """API endpoint to retrieve a single ride"""
