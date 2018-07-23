@@ -171,6 +171,12 @@ def create_ride_request(ride_id):
     if access_token:
         username = verify_token(access_token)
         requester = User.get_user(username)
+        ride = Ride.get_one_ride(ride_id)
+        offerer = ride.name
+
+        if offerer == username:
+            abort(401, "You can't request a ride that you created")
+
         ride_req = Request(username)
         req_id = ride_req.add_ride_request(ride_id, requester.user_id)
         response = {
