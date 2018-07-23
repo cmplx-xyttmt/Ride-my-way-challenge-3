@@ -164,12 +164,7 @@ def create_ride():
 
 @app.route('/ridemyway/api/v1/rides/<ride_id>/requests', methods=['POST'])
 def create_ride_request(ride_id):
-    try:
-        ride_id = int(ride_id)
-    except ValueError:
-        ride_id = ride_id
-
-    if type(ride_id) is not int:
+    if not Validate.validate_int(ride_id):
         abort(400, 'Make sure the ride id is an integer')
 
     access_token = request.headers.get('Authorization')
