@@ -116,10 +116,7 @@ def get_rides():
 
     access_token = request.headers.get('Authorization')
     if access_token:
-        token_good = verify_token(access_token)
-        if not token_good[0]:
-            abort(401, token_good[1])
-
+        verify_token(access_token)
         ride_offers = Ride.get_all_rides()
         rides_as_dicts = [convert_ride_offer(ride) for ride in ride_offers]
         return jsonify({'rides': rides_as_dicts}), 200
@@ -132,11 +129,7 @@ def get_my_rides():
     """API endpoint for getting a particular users rides"""
     access_token = request.headers.get('Authorization')
     if access_token:
-        token_good = verify_token(access_token)
-        if not token_good[0]:
-            abort(401, token_good[1])
-
-        username = token_good[1]
+        username = verify_token(access_token)
 
         ride_offers = Ride.get_all_rides(username)
         rides_as_dicts = [convert_ride_offer(ride) for ride in ride_offers]
@@ -158,10 +151,7 @@ def get_ride(ride_id):
 
     access_token = request.headers.get('Authorization')
     if access_token:
-        token_good = verify_token(access_token)
-        if not token_good[0]:
-            abort(401, token_good[1])
-
+        verify_token(access_token)
         ride = Ride.get_one_ride(ride_id)
         if ride:
             return jsonify({'ride': convert_ride_offer(ride)}), 200
@@ -179,11 +169,7 @@ def create_ride():
 
     access_token = request.headers.get('Authorization')
     if access_token:
-        token_good = verify_token(access_token)
-        if not token_good[0]:
-            abort(401, token_good[1])
-
-        username = token_good[1]
+        username = verify_token(access_token)
 
         if not request.is_json:
             abort(400, 'Make sure your request contains json data')
@@ -226,11 +212,7 @@ def create_ride_request(ride_id):
 
     access_token = request.headers.get('Authorization')
     if access_token:
-        token_good = verify_token(access_token)
-        if not token_good[0]:
-            abort(401, token_good[1])
-
-        username = token_good[1]
+        username = verify_token(access_token)
         requester = User.get_user(username)
         ride_req = Request(username)
         req_id = ride_req.add_ride_request(ride_id, requester.user_id)
@@ -256,11 +238,7 @@ def view_ride_requests(ride_id):
 
     access_token = request.headers.get('Authorization')
     if access_token:
-        token_good = verify_token(access_token)
-        if not token_good[0]:
-            abort(401, token_good[1])
-
-        username = token_good[1]
+        username = verify_token(access_token)
         ride = Ride.get_one_ride(ride_id)
         if not ride:
             abort(400, 'Ride does not exist.')
@@ -291,11 +269,7 @@ def accept_reject_request(ride_id, request_id):
 
     access_token = request.headers.get('Authorization')
     if access_token:
-        token_good = verify_token(access_token)
-        if not token_good[0]:
-            abort(401, token_good[1])
-
-        username = token_good[1]
+        username = verify_token(access_token)
         ride = Ride.get_one_ride(ride_id)
 
         #  Check if this user is the one that created the ride request
@@ -343,10 +317,10 @@ def verify_token(access_token):
     username = User.decode_token(access_token)
 
     if username == "Invalid token. Please register or login":
-        return False, username
+        abort(401, username)
     elif username == "Token is expired. Please login again":
-        return False, username
-    return True, username
+        abort(401, username)
+    return username
 
 
 @app.errorhandler(404)
