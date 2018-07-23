@@ -1,7 +1,7 @@
 from app import app
 from app.models import User, Ride, Request
 from flask import request, abort, jsonify, make_response
-from app.helper_functions import sign_up_user
+from app.helper_functions import sign_up_user, login_user
 from app.validators import Validate
 
 
@@ -68,28 +68,7 @@ def login():
     if not val[0]:
         abort(401, val[1])
 
-    user = User.get_user(username)
-
-    if not user:
-        response = {
-            'message': 'User account does not exist'
-        }
-        return make_response(jsonify(response)), 401
-
-    if user.verify_password(password):
-        # generate access token
-        token = user.generate_auth_token()
-        response = {
-            'message': 'Logged in successfully',
-            'access_token': token.decode('UTF-8')
-        }
-        return make_response(jsonify(response)), 200
-
-    # If wrong password
-    response = {
-        'message': 'Invalid user credentials'
-    }
-    return make_response(jsonify(response)), 401
+    return login_user(username, password)
 
 
 @app.route('/ridemyway/api/v1/rides', methods=['GET'])
