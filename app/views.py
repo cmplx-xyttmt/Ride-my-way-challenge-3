@@ -1,7 +1,8 @@
 from app import app
 from app.models import User, Ride, Request
 from flask import request, abort, jsonify, make_response
-from app.helper_functions import sign_up_user, login_user
+from app.helper_functions import sign_up_user, \
+    login_user, return_requests
 from app.validators import Validate
 
 
@@ -204,19 +205,7 @@ def view_ride_requests(ride_id):
         if not ride:
             abort(400, 'Ride does not exist.')
 
-        #  Check if this user is the one that created the ride request
-        if ride.name == username:
-            requests_list = Request.get_ride_requests(ride_id)
-            requests_list = [req.__dict__ for req in requests_list]
-            response = {
-                'ride_requests': requests_list
-            }
-            return make_response(jsonify(response)), 200
-        else:
-            abort(401,
-                  'You are not authorized to view these '
-                  'ride requests because you did not create this ride offer.')
-
+        return return_requests(ride_id, ride, username)
     else:
         abort(401, 'Please provide an access token')
 
