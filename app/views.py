@@ -177,6 +177,9 @@ def create_ride_request(ride_id):
         if offerer == username:
             abort(401, "You can't request a ride that you created")
 
+        if Request.user_requested(ride_id, username):
+            abort(401, "You already requested this ride")
+
         ride_req = Request(username)
         req_id = ride_req.add_ride_request(ride_id, requester.user_id)
         response = {
