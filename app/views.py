@@ -1,6 +1,7 @@
 from app import app
 from app.models import User, Ride, Request
 from flask import request, abort, jsonify, make_response
+from app.helper_functions import sign_up_user
 from app.validators import Validate
 
 
@@ -42,26 +43,7 @@ def signup():
     if not val[0]:
         abort(401, val[1])
 
-    user = User.get_user(username)
-    if user:
-        response = {
-            'error': 'Conflict',
-            'message': 'User already exists. Choose a different username'
-        }
-        return make_response(jsonify(response)), 409
-
-    user = User(username=username)
-    user.hash_password(password)
-    user.email = email
-    user_id = user.add_new_user()
-
-    response = {
-        'message': 'Signed up successfully',
-        'username': user.username,
-        'id': user_id,
-        'email': email
-    }
-    return make_response(jsonify(response)), 201
+    return sign_up_user(username, password, email)
 
 
 @app.route('/ridemyway/api/v1/auth/login', methods=['POST'])
