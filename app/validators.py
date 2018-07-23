@@ -31,6 +31,15 @@ class Validate:
             return [False, 'Email in wrong format']
 
     @staticmethod
+    def validate_int(value):
+        """Makes sure the value supplied is an integer"""
+        try:
+            int(value)
+            return True
+        except ValueError:
+            return False
+
+    @staticmethod
     def validate_date(date):
         """Checks if date is in correct format"""
         pass
