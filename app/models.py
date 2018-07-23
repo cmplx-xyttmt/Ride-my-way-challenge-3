@@ -259,6 +259,27 @@ class Request:
         return ride_requests
 
     @staticmethod
+    def user_requested(ride_id, username):
+        """Determines if a user has already requested a ride"""
+        columns = ("r.*",
+                   "u.username")
+
+        table = "riderequests r"
+        left_join = "users u on r.passenger_id = u.user_id"
+        where = "r.ride_id = " + str(ride_id) + \
+                " and u.username = \'" + username + "\'"
+
+        database_conn = Database()
+        data_returned = database_conn.select(table,
+                                             columns,
+                                             left_join,
+                                             where)
+
+        if data_returned:
+            return True
+        return False
+
+    @staticmethod
     def accept_reject_ride_request(decision, request_id):
         """Method to accept/reject a ride request"""
         database_conn = Database()
