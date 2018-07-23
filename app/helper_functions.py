@@ -28,3 +28,28 @@ def sign_up_user(username, password, email):
         'email': email
     }
     return make_response(jsonify(response)), 201
+
+
+def login_user(username, password):
+    user = User.get_user(username)
+
+    if not user:
+        response = {
+            'message': 'User account does not exist'
+        }
+        return make_response(jsonify(response)), 401
+
+    if user.verify_password(password):
+        # generate access token
+        token = user.generate_auth_token()
+        response = {
+            'message': 'Logged in successfully',
+            'access_token': token.decode('UTF-8')
+        }
+        return make_response(jsonify(response)), 200
+
+    # If wrong password
+    response = {
+        'message': 'Invalid user credentials'
+    }
+    return make_response(jsonify(response)), 401
