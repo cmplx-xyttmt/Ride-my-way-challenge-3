@@ -139,13 +139,13 @@ class TestAuth(unittest.TestCase):
 
     def test_create_ride_request(self):
         """Tests whether a user can create a ride request"""
-        token = self.token
+        token = self.login_signup(self.user)
 
         resp = self.create_ride(self.ride_1, token)
         self.assertEqual(201, resp.status_code)
         resp = self.client.post("/ridemyway/api/v1/rides/{}/requests".
                                 format(1),
-                                headers={'Authorization': token})
+                                headers={'Authorization': self.token})
         self.assertEqual(201, resp.status_code)
         data = json.loads(str(resp.data.decode()))
         self.assertIn('message', data)
@@ -154,11 +154,11 @@ class TestAuth(unittest.TestCase):
 
     def test_view_ride_requests(self):
         """Tests whether a user that created a ride request can view the ride requests"""
-        token = self.token
+        token = self.login_signup(self.user)
 
         resp = self.create_ride(self.ride_1, token)
         self.assertEqual(201, resp.status_code)
-        resp = self.create_request(token)
+        resp = self.create_request(self.token)
         self.assertEqual(201, resp.status_code)
         resp = self.client.get("/ridemyway/api/v1/users/rides/{}/requests".
                                format(1),
@@ -168,8 +168,8 @@ class TestAuth(unittest.TestCase):
         self.assertIn('ride_requests', data)
 
     def test_accept_reject_request(self):
-        token = self.token
-        resp = self.create_ride(self.ride_1, token)
+        token = self.login_signup(self.user)
+        resp = self.create_ride(self.ride_1, self.token)
         self.assertEqual(201, resp.status_code)
         resp = self.create_request(token)
         self.assertEqual(201, resp.status_code)
@@ -179,7 +179,7 @@ class TestAuth(unittest.TestCase):
                                .format(1, 1),
                                content_type="application/json",
                                data=json.dumps(req),
-                               headers={"Authorization": token})
+                               headers={"Authorization": self.token})
 
         self.assertEqual(200, resp.status_code)
         data = json.loads(str(resp.data.decode()))
