@@ -71,6 +71,7 @@ The following are the api endpoints implemented:
 | HTTP Method | Endpoint | Public | Action |
 |:-----------:|:--------:|:------:|:------:|  
 |GET|/rides|False|Get all available rides|
+|GET|/rides|False|Get all available rides|
 |GET|/rides/\<rideId\>|False|Fetch the details of a single ride offer|
 |POST|/users/rides|False|Create a ride offer|
 

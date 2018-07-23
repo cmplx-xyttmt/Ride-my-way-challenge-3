@@ -285,13 +285,9 @@ def view_ride_requests(ride_id):
 @app.route('/ridemyway/api/v1/users/rides/<ride_id>/requests/<request_id>',
            methods=['PUT'])
 def accept_reject_request(ride_id, request_id):
-    try:
-        ride_id = int(ride_id)
-    except ValueError:
-        ride_id = ride_id
-
-    if type(ride_id) is not int:
-        abort(400, 'Make sure the ride id is an integer')
+    if not Validate.validate_int(ride_id) or \
+            not Validate.validate_int(request_id):
+        abort(400, 'Make sure the ride and request ids are integers')
 
     access_token = request.headers.get('Authorization')
     if access_token:
