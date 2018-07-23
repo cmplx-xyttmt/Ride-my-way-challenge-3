@@ -182,8 +182,8 @@ class Ride:
         if len(data_returned) == 0:
             return rides
 
-        for row in data_returned[0]:
-            row = tuple(row.replace("(", "").replace(")", "").split(","))
+        for row in data_returned:
+            row = tuple(row[0].replace("(", "").replace(")", "").split(","))
             origin = row[2]
             destination = row[3]
             price = row[4]
@@ -247,8 +247,8 @@ class Request:
         if len(data_returned) == 0:
             return ride_requests
 
-        for row in data_returned[0]:
-            row = tuple(row.replace("(", "").replace(")", "").split(","))
+        for row in data_returned:
+            row = tuple(row[0].replace("(", "").replace(")", "").split(","))
             rq_name = row[5]
             ride_req = Request(rq_name)
             ride_req.id = row[0]
