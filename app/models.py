@@ -77,6 +77,20 @@ class User:
 
         return user
 
+    def update_rides(self, field):
+        """Updates the rides taken and given by a user"""
+        database_conn = Database()
+        sett = field + " = " + field + " + 1"
+        where = "username = '" + self.username + "'"
+
+        return_val = database_conn.update('users',
+                                          sett,
+                                          where)
+
+        if return_val:
+            return True
+        return False
+
     def generate_auth_token(self):
         payload = {
             'user': self.username,
