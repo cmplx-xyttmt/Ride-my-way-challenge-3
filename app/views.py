@@ -72,6 +72,31 @@ def login():
     return login_user(username, password)
 
 
+@app.route('/ridemyway/api/v1/user/<username>',
+           methods=['GET'])
+def user_details(username):
+    """Get the details of a specific user"""
+    access_token = request.headers.get('Authorization')
+    if not access_token:
+        abort(401, 'Please provide an access token')
+
+    verify_token(access_token)
+    user = User.get_user(username)
+    if not user:
+        response = {
+            'error': 'Not found',
+            'message': 'User does not exist'
+        }
+        return make_response(jsonify(response)), 404
+
+    response = {
+        "username": user.username,
+        "rides_taken": user.rides_taken,
+        "ride_given": user.rides_given
+    }
+    return make_response(jsonify(response)), 200
+
+
 @app.route('/ridemyway/api/v1/rides', methods=['GET'])
 def get_rides():
     """API endpoint for getting all the ride offers"""
