@@ -171,7 +171,7 @@ class Ride:
             origin = row[2]
             destination = row[3]
             price = row[4]
-            username = row[5]
+            username = row[5].replace("\"", "")
             ride = Ride(username, origin, destination, price)
             ride.id = row[0]
 
@@ -201,7 +201,7 @@ class Ride:
             origin = row[2]
             destination = row[3]
             price = row[4]
-            username = row[5]
+            username = row[5].replace("\"", "")
             new_ride = Ride(username, origin, destination, price)
             new_ride.id = row[0]
             rides.append(new_ride)
@@ -263,7 +263,7 @@ class Request:
 
         for row in data_returned:
             row = tuple(row[0].replace("(", "").replace(")", "").split(","))
-            rq_name = row[5]
+            rq_name = row[5].replace("\"", "")
             ride_req = Request(rq_name)
             ride_req.id = row[0]
             ride_req.accepted = row[3]
