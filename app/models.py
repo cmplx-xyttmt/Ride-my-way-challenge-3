@@ -265,7 +265,7 @@ class Request:
         for row in data_returned[0]:
             row = tuple(row.replace("(", "").replace(")", "").split(","))
             ride_id = row[1]
-            requester_name = row[5]
+            requester_name = row[5].replace("\"", "")
             request = Request(requester_name)
             request.id = row[0]
 
