@@ -243,6 +243,35 @@ class Request:
         return self.id
 
     @staticmethod
+    def get_one_ride_request(request_id):
+        """Returns a particular ride request
+        and the ride id on which the request was made"""
+        database_conn = Database()
+        columns = ("r.*", "u.username")
+        table = "riderequests r"
+        left_join = "users u on (u.user_id=r.passenger_id)"
+        where = 'r.request_id = ' + str(request_id)
+
+        data_returned = database_conn.select(table,
+                                             columns,
+                                             left_join,
+                                             where)
+
+        request = None
+        ride_id = None
+        if len(data_returned) == 0:
+            return request, ride_id
+
+        for row in data_returned[0]:
+            row = tuple(row.replace("(", "").replace(")", "").split(","))
+            ride_id = row[1]
+            requester_name = row[5]
+            request = Request(requester_name)
+            request.id = row[0]
+
+        return request, ride_id
+
+    @staticmethod
     def get_ride_requests(ride_id):
         """Gets all the ride requests for a particular ride offer"""
         columns = ("r.*",
