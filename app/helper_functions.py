@@ -2,7 +2,7 @@
 This file contains helper functions to be used in the views.py
 It helps keep the codebase manageable
 """
-from app.models import User, Request
+from app.models import User, Request, Ride
 from flask import abort, jsonify, make_response
 
 
@@ -85,6 +85,14 @@ def accept_or_reject(request_id, data):
     if success:
         if decision == 'accept':
             message = 'You have accepted this ride request'
+            req_info = Request.get_one_ride_request(request_id)
+            passenger_name = req_info[0].name
+            driver_name = Ride.get_one_ride(req_info[1]).name
+
+            passenger = User.get_user(passenger_name)
+            driver = User.get_user(driver_name)
+            passenger.update_rides('rides_taken')
+            driver.update_rides('rides_given')
         else:
             message = 'You have rejected this ride request'
 
